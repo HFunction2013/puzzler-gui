@@ -1,0 +1,37 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="PuzzlerGui.App"
+             RequestedThemeVariant="Default">
+
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+          <SolidColorBrush x:Key="AppBackground" Color="#F4F6FA" />
+          <SolidColorBrush x:Key="CardBackground" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="CardBorder" Color="#E1E6EF" />
+          <SolidColorBrush x:Key="MutedText" Color="#6B778C" />
+          <SolidColorBrush x:Key="Accent" Color="#3B6FD4" />
+          <SolidColorBrush x:Key="AccentHover" Color="#2E5DB8" />
+          <SolidColorBrush x:Key="SubtleBackground" Color="#F7F9FC" />
+          <SolidColorBrush x:Key="CanvasBackground" Color="#FFFFFF" />
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+          <SolidColorBrush x:Key="AppBackground" Color="#12151C" />
+          <SolidColorBrush x:Key="CardBackground" Color="#191D26" />
+          <SolidColorBrush x:Key="CardBorder" Color="#2A3240" />
+          <SolidColorBrush x:Key="MutedText" Color="#95A1B5" />
+          <SolidColorBrush x:Key="Accent" Color="#6C9BFF" />
+          <SolidColorBrush x:Key="AccentHover" Color="#8AAFFF" />
+          <SolidColorBrush x:Key="SubtleBackground" Color="#161A23" />
+          <SolidColorBrush x:Key="CanvasBackground" Color="#151922" />
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+
+  <Application.Styles>
+    <FluentTheme />
+    <StyleInclude Source="avares://PuzzlerGui/Styles/AppStyles.axaml" />
+  </Application.Styles>
+</Application>

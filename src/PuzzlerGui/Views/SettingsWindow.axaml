@@ -1,0 +1,30 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="PuzzlerGui.Views.SettingsWindow"
+        Title="Settings"
+        Width="640"
+        Height="300"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="{DynamicResource AppBackground}">
+
+  <StackPanel Margin="24" Spacing="14">
+    <TextBlock Classes="title" Text="Solver" />
+    <TextBlock Classes="hint"
+               Text="puzzler-gui calls the puzzler executable to enumerate solutions. Leave the path empty to look next to the application and on PATH." />
+
+    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+      <TextBox x:Name="PathBox" Watermark="Path to puzzler or puzzler.exe" />
+      <Button Grid.Column="1" Content="Browse…" Click="OnBrowseClick" />
+      <Button Grid.Column="2" Content="Auto-detect" Click="OnDetectClick" />
+    </Grid>
+
+    <TextBlock x:Name="StatusText" Classes="hint" Text="" />
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,10,0,0">
+      <Button Content="Cancel" Click="OnCancelClick" MinWidth="88" HorizontalContentAlignment="Center" />
+      <Button Content="OK" Click="OnOkClick" MinWidth="88" HorizontalContentAlignment="Center" />
+    </StackPanel>
+  </StackPanel>
+</Window>

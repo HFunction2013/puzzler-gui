@@ -1,0 +1,400 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:PuzzlerGui.ViewModels"
+        xmlns:models="using:PuzzlerGui.Models"
+        xmlns:controls="using:PuzzlerGui.Controls"
+        x:Class="PuzzlerGui.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="{Binding WindowTitle}"
+        Width="1240" Height="800"
+        MinWidth="1000" MinHeight="640"
+        Icon="avares://PuzzlerGui/Assets/puzzler-gui.png"
+        Background="{DynamicResource AppBackground}"
+        WindowStartupLocation="CenterScreen">
+
+  <DockPanel>
+
+    <Menu DockPanel.Dock="Top" Background="{DynamicResource CardBackground}">
+      <MenuItem Header="_File">
+        <MenuItem Header="_New puzzle" InputGesture="Ctrl+N" Click="OnNewClick" />
+        <MenuItem Header="_Open…" InputGesture="Ctrl+O" Click="OnOpenClick" />
+        <MenuItem Header="_Save" InputGesture="Ctrl+S" Click="OnSaveClick" />
+        <MenuItem Header="Save _as…" InputGesture="Ctrl+Shift+S" Click="OnSaveAsClick" />
+        <Separator />
+        <MenuItem Header="Open _sample">
+          <MenuItem Header="Dominoes 2×3" Tag="dominoes_2x3.pzle" Click="OnSampleClick" />
+          <MenuItem Header="Four dominoes" Tag="four_dominoes.pzle" Click="OnSampleClick" />
+          <MenuItem Header="No-rotate row" Tag="no_rotate_row.pzle" Click="OnSampleClick" />
+          <MenuItem Header="Chiral L pair" Tag="chiral_l_pair.pzle" Click="OnSampleClick" />
+          <MenuItem Header="Per-piece override" Tag="per_piece_override.pzle" Click="OnSampleClick" />
+          <MenuItem Header="Subset tiling" Tag="subset_tiling.pzle" Click="OnSampleClick" />
+          <MenuItem Header="T board" Tag="t_board.pzle" Click="OnSampleClick" />
+          <MenuItem Header="Ring of L tetrominoes" Tag="ring_l_tetrominoes.pzle" Click="OnSampleClick" />
+          <MenuItem Header="Pentominoes 3×20" Tag="pentomino_3x20.pzle" Click="OnSampleClick" />
+          <MenuItem Header="Pentominoes 6×10 (2,339 solutions)" Tag="pentomino_6x10.pzle" Click="OnSampleClick" />
+        </MenuItem>
+        <Separator />
+        <MenuItem Header="_Exit" Click="OnExitClick" />
+      </MenuItem>
+
+      <MenuItem Header="_Solve">
+        <MenuItem Header="_Solve puzzle" InputGesture="F5" Click="OnSolveClick" />
+        <MenuItem Header="_Cancel search" Click="OnCancelClick" />
+        <Separator />
+        <MenuItem Header="_Validate with puzzler" Click="OnValidateClick" />
+      </MenuItem>
+
+      <MenuItem Header="_Settings">
+        <MenuItem Header="Solver &amp; preferences…" Click="OnSettingsClick" />
+      </MenuItem>
+
+      <MenuItem Header="_View">
+        <MenuItem Header="Light theme" Tag="Light" Click="OnThemeClick" />
+        <MenuItem Header="Dark theme" Tag="Dark" Click="OnThemeClick" />
+        <MenuItem Header="Follow system" Tag="System" Click="OnThemeClick" />
+      </MenuItem>
+
+      <MenuItem Header="_Help">
+        <MenuItem Header="_About puzzler-gui" Click="OnAboutClick" />
+      </MenuItem>
+    </Menu>
+
+    <Border DockPanel.Dock="Top"
+            IsVisible="{Binding HasBanner}"
+            Background="{Binding BannerBrush}"
+            Padding="16,9">
+      <TextBlock Text="{Binding BannerText}"
+                 Foreground="{Binding BannerForeground}"
+                 TextWrapping="Wrap"
+                 VerticalAlignment="Center" />
+    </Border>
+
+    <Border DockPanel.Dock="Bottom" Classes="statusBar">
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" />
+          <TextBlock Text="{Binding ElapsedText}"
+                     IsVisible="{Binding IsSolving}"
+                     Classes="hint"
+                     VerticalAlignment="Center" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+          <TextBlock Text="{Binding SolverStatusText}"
+                     Classes="hint"
+                     VerticalAlignment="Center"
+                     MaxWidth="520"
+                     TextTrimming="CharacterEllipsis" />
+          <Button Content="Settings…" Classes="link" Click="OnSettingsClick" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <Grid Margin="16" ColumnDefinitions="380,12,*">
+
+      <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="12">
+
+          <!-- Puzzle properties -->
+          <Border Classes="card">
+            <StackPanel Spacing="8">
+              <TextBlock Classes="section" Text="PUZZLE" />
+              <TextBox Text="{Binding Document.Name, Mode=TwoWay}" Watermark="Puzzle name" />
+              <CheckBox IsChecked="{Binding Document.AllUse, Mode=TwoWay}"
+                        Content="All pieces must be used" />
+              <CheckBox IsChecked="{Binding Document.CanRotate, Mode=TwoWay}"
+                        Content="Pieces can rotate (default)" />
+              <CheckBox IsChecked="{Binding Document.CanFlip, Mode=TwoWay}"
+                        Content="Pieces can flip (default)" />
+            </StackPanel>
+          </Border>
+
+          <!-- Board -->
+          <Border Classes="card">
+            <StackPanel Spacing="8">
+              <TextBlock Classes="section" Text="BOARD" />
+              <Grid ColumnDefinitions="*,8,*">
+                <StackPanel Spacing="2">
+                  <TextBlock Classes="hint" Text="Width" />
+                  <NumericUpDown Value="{Binding BoardWidthValue, Mode=TwoWay}"
+                                 Minimum="1" Maximum="128" Increment="1" FormatString="0" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Spacing="2">
+                  <TextBlock Classes="hint" Text="Height" />
+                  <NumericUpDown Value="{Binding BoardHeightValue, Mode=TwoWay}"
+                                 Minimum="1" Maximum="128" Increment="1" FormatString="0" />
+                </StackPanel>
+              </Grid>
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Content="Fill all" Command="{Binding FillBoardCommand}" />
+                <Button Content="Clear all" Command="{Binding ClearBoardCommand}" />
+              </StackPanel>
+              <TextBlock Classes="hint"
+                         Text="Paint cells in the Board tab: left click toggles, right click blocks." />
+            </StackPanel>
+          </Border>
+
+          <!-- Pieces -->
+          <Border Classes="card">
+            <StackPanel Spacing="8">
+              <DockPanel>
+                <TextBlock Classes="section" Text="PIECES" VerticalAlignment="Center" />
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6">
+                  <Button Content="Add" Command="{Binding AddPieceCommand}" />
+                  <Button Content="Remove" Command="{Binding RemovePieceCommand}" />
+                </StackPanel>
+              </DockPanel>
+
+              <ListBox ItemsSource="{Binding Document.Pieces}"
+                       SelectedItem="{Binding SelectedPiece, Mode=TwoWay}"
+                       Classes="pieces"
+                       MaxHeight="230"
+                       Background="Transparent"
+                       BorderThickness="0">
+                <ListBox.ItemTemplate>
+                  <DataTemplate x:DataType="models:PieceModel">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                      <Border Width="10" Height="10" CornerRadius="5"
+                              Background="{Binding Brush}"
+                              VerticalAlignment="Center" />
+                      <StackPanel Grid.Column="1" Spacing="1">
+                        <TextBlock Text="{Binding Id}" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding CellSummary}" Classes="hint" />
+                      </StackPanel>
+                      <controls:GridCanvas Grid.Column="2"
+                                           Data="{Binding Surface}"
+                                           IsEditable="False"
+                                           ShowLabels="False"
+                                           Width="42" Height="42"
+                                           MaxCellSize="10" />
+                    </Grid>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+
+              <TextBlock Classes="hint"
+                         IsVisible="{Binding !HasSelectedPiece}"
+                         Text="Select a piece to edit its shape and options." />
+
+              <StackPanel Spacing="8" IsVisible="{Binding HasSelectedPiece}">
+                <Separator />
+                <Grid ColumnDefinitions="2*,8,*">
+                  <StackPanel Spacing="2">
+                    <TextBlock Classes="hint" Text="Id" />
+                    <TextBox Text="{Binding SelectedPieceId, Mode=TwoWay}" />
+                  </StackPanel>
+                  <StackPanel Grid.Column="2" Spacing="2">
+                    <TextBlock Classes="hint" Text="Count" />
+                    <NumericUpDown Value="{Binding PieceCountValue, Mode=TwoWay}"
+                                   Minimum="1" Maximum="65535" Increment="1" FormatString="0" />
+                  </StackPanel>
+                </Grid>
+
+                <Grid ColumnDefinitions="*,8,*">
+                  <StackPanel Spacing="2">
+                    <TextBlock Classes="hint" Text="Rotation override" />
+                    <ComboBox ItemsSource="{Binding TriStateOptions}"
+                              SelectedItem="{Binding SelectedPiece.CanRotate, Mode=TwoWay}"
+                              HorizontalAlignment="Stretch" />
+                  </StackPanel>
+                  <StackPanel Grid.Column="2" Spacing="2">
+                    <TextBlock Classes="hint" Text="Flip override" />
+                    <ComboBox ItemsSource="{Binding TriStateOptions}"
+                              SelectedItem="{Binding SelectedPiece.CanFlip, Mode=TwoWay}"
+                              HorizontalAlignment="Stretch" />
+                  </StackPanel>
+                </Grid>
+
+                <Grid ColumnDefinitions="*,8,*">
+                  <StackPanel Spacing="2">
+                    <TextBlock Classes="hint" Text="Shape width" />
+                    <NumericUpDown Value="{Binding ShapeWidthValue, Mode=TwoWay}"
+                                   Minimum="1" Maximum="64" Increment="1" FormatString="0" />
+                  </StackPanel>
+                  <StackPanel Grid.Column="2" Spacing="2">
+                    <TextBlock Classes="hint" Text="Shape height" />
+                    <NumericUpDown Value="{Binding ShapeHeightValue, Mode=TwoWay}"
+                                   Minimum="1" Maximum="64" Increment="1" FormatString="0" />
+                  </StackPanel>
+                </Grid>
+
+                <Border Classes="canvasHost" Height="150">
+                  <controls:GridCanvas x:Name="PieceCanvas"
+                                       Data="{Binding PieceSurface}"
+                                       IsEditable="True"
+                                       ShowLabels="False"
+                                       MaxCellSize="28" />
+                </Border>
+
+                <WrapPanel Orientation="Horizontal">
+                  <Button Content="Rotate ⟲" Margin="0,0,6,6" Command="{Binding RotatePieceLeftCommand}" />
+                  <Button Content="Rotate ⟳" Margin="0,0,6,6" Command="{Binding RotatePieceRightCommand}" />
+                  <Button Content="Mirror" Margin="0,0,6,6" Command="{Binding MirrorPieceCommand}" />
+                  <Button Content="Trim" Margin="0,0,6,6" Command="{Binding TrimPieceCommand}" />
+                  <Button Content="Clear" Margin="0,0,6,6" Command="{Binding ClearPieceCommand}" />
+                  <Button Content="Duplicate" Margin="0,0,6,6" Command="{Binding DuplicatePieceCommand}" />
+                </WrapPanel>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+
+          <!-- Solver -->
+          <Border Classes="card">
+            <StackPanel Spacing="8">
+              <TextBlock Classes="section" Text="SOLVER" />
+
+              <Grid ColumnDefinitions="*,8,*">
+                <StackPanel Spacing="2">
+                  <TextBlock Classes="hint" Text="Max solutions" />
+                  <NumericUpDown Value="{Binding LimitSolutions, Mode=TwoWay}"
+                                 Minimum="1" Maximum="1000000" Increment="1"
+                                 FormatString="0" Watermark="all" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Spacing="2">
+                  <TextBlock Classes="hint" Text="Node limit" />
+                  <NumericUpDown Value="{Binding NodeLimit, Mode=TwoWay}"
+                                 Minimum="1" Maximum="1000000000000" Increment="1000"
+                                 FormatString="0" Watermark="none" />
+                </StackPanel>
+              </Grid>
+
+              <Grid ColumnDefinitions="*,8,*">
+                <StackPanel Spacing="2">
+                  <TextBlock Classes="hint" Text="Time limit (seconds)" />
+                  <NumericUpDown Value="{Binding TimeLimit, Mode=TwoWay}"
+                                 Minimum="0" Maximum="86400" Increment="0.5"
+                                 FormatString="0.###" Watermark="none" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Spacing="2">
+                  <TextBlock Classes="hint" Text="Colour seed" />
+                  <NumericUpDown Value="{Binding SeedValue, Mode=TwoWay}"
+                                 Minimum="0" Maximum="1000000000000" Increment="1"
+                                 FormatString="0" Watermark="clock" />
+                </StackPanel>
+              </Grid>
+
+              <CheckBox IsChecked="{Binding Dedupe, Mode=TwoWay}"
+                        Content="Merge solutions equal under board symmetry" />
+
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Classes="primary" Content="Solve" Command="{Binding SolveCommand}"
+                        MinWidth="120" />
+                <Button Content="Cancel" Command="{Binding CancelSolveCommand}"
+                        IsVisible="{Binding IsSolving}" />
+              </StackPanel>
+
+              <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsSolving}" Height="4" />
+
+              <TextBlock Text="{Binding ValidationText}"
+                         Foreground="{Binding ValidationBrush}"
+                         TextWrapping="Wrap"
+                         FontSize="11" />
+            </StackPanel>
+          </Border>
+
+        </StackPanel>
+      </ScrollViewer>
+
+      <TabControl Grid.Column="2" SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
+
+        <TabItem Header="Board">
+          <Grid RowDefinitions="*,Auto" Margin="0,8,0,0">
+            <Border Grid.Row="0" Classes="canvasHost">
+              <controls:GridCanvas x:Name="BoardCanvas"
+                                   Data="{Binding BoardSurface}"
+                                   IsEditable="True"
+                                   ShowLabels="False"
+                                   MaxCellSize="72" />
+            </Border>
+            <TextBlock Grid.Row="1" Classes="hint" Margin="2,8,0,0"
+                       Text="{Binding BoardSummary}" />
+          </Grid>
+        </TabItem>
+
+        <TabItem Header="{Binding SolutionsTabHeader}">
+          <DockPanel Margin="0,8,0,0">
+
+            <Border DockPanel.Dock="Top" Padding="0,0,0,8">
+              <Grid ColumnDefinitions="Auto,*,Auto">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <Button Classes="nav" Content="⏮" ToolTip.Tip="First"
+                          Command="{Binding FirstSolutionCommand}" />
+                  <Button Classes="nav" Content="◀" ToolTip.Tip="Previous"
+                          Command="{Binding PreviousSolutionCommand}" />
+                  <TextBlock Text="{Binding SolutionIndexLabel}"
+                             VerticalAlignment="Center"
+                             MinWidth="68"
+                             TextAlignment="Center"
+                             FontWeight="SemiBold" />
+                  <Button Classes="nav" Content="▶" ToolTip.Tip="Next"
+                          Command="{Binding NextSolutionCommand}" />
+                  <Button Classes="nav" Content="⏭" ToolTip.Tip="Last"
+                          Command="{Binding LastSolutionCommand}" />
+                </StackPanel>
+                <TextBlock Grid.Column="1"
+                           Text="{Binding StatLine}"
+                           Classes="hint"
+                           VerticalAlignment="Center"
+                           Margin="16,0"
+                           TextTrimming="CharacterEllipsis" />
+                <Button Grid.Column="2" Content="Export JSON…" Click="OnExportClick" />
+              </Grid>
+            </Border>
+
+            <Border DockPanel.Dock="Top"
+                    IsVisible="{Binding SolutionsStale}"
+                    Background="#FFF1CC"
+                    Padding="10,6"
+                    CornerRadius="6"
+                    Margin="0,0,0,8">
+              <TextBlock Text="The puzzle changed after this solve — run the solver again to refresh the results."
+                         Foreground="#6B4A00"
+                         FontSize="11"
+                         TextWrapping="Wrap" />
+            </Border>
+
+            <Border DockPanel.Dock="Right" Width="300" Classes="card" Margin="12,0,0,0">
+              <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Spacing="6">
+                  <TextBlock Classes="section" Text="PLACEMENTS" />
+                  <TextBlock Text="{Binding MultiplicityText}" Classes="hint" Margin="0,0,0,4" />
+                  <ItemsControl ItemsSource="{Binding Placements}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:PlacementRow">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" Margin="0,2">
+                          <Border Width="8" Height="8" CornerRadius="4"
+                                  Background="{Binding Brush}" VerticalAlignment="Center" />
+                          <TextBlock Grid.Column="1" Text="{Binding Text}" FontSize="11"
+                                     TextWrapping="Wrap" />
+                        </Grid>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+              </ScrollViewer>
+            </Border>
+
+            <Grid>
+              <Border Classes="canvasHost">
+                <controls:GridCanvas Data="{Binding SolutionSurface}"
+                                     IsEditable="False"
+                                     ShowLabels="True"
+                                     MaxCellSize="72" />
+              </Border>
+              <TextBlock Text="{Binding EmptyHintText}"
+                         IsVisible="{Binding EmptyHintVisible}"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         TextAlignment="Center"
+                         TextWrapping="Wrap"
+                         MaxWidth="380"
+                         Foreground="{DynamicResource MutedText}" />
+            </Grid>
+
+          </DockPanel>
+        </TabItem>
+
+      </TabControl>
+
+    </Grid>
+  </DockPanel>
+</Window>

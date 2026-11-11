@@ -1,0 +1,178 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to stamp into the build (without a leading v)
+        required: false
+        default: '0.1.0'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build (${{ matrix.rid }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            rid: linux-x64
+            archive: tar.gz
+            cargo_target: ''
+          - os: windows-latest
+            rid: win-x64
+            archive: zip
+            cargo_target: ''
+          - os: macos-15-intel
+            rid: osx-x64
+            archive: tar.gz
+            cargo_target: x86_64-apple-darwin
+          - os: macos-15
+            rid: osx-arm64
+            archive: tar.gz
+            cargo_target: aarch64-apple-darwin
+
+    env:
+      RID: ${{ matrix.rid }}
+      CARGO_TARGET: ${{ matrix.cargo_target }}
+
+    steps:
+      - name: Check out puzzler-gui
+        uses: actions/checkout@v4
+
+      - name: Resolve version
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="${{ github.event.inputs.version }}"
+            if [ -z "$VERSION" ]; then VERSION="0.1.0"; fi
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "Building puzzler-gui $VERSION for $RID"
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Add macOS cross target
+        if: matrix.cargo_target != ''
+        run: rustup target add ${{ matrix.cargo_target }}
+
+      - name: Check out the puzzler solver
+        uses: actions/checkout@v4
+        with:
+          repository: HFunction2013/puzzler
+          path: cli
+
+      - name: Build the solver
+        shell: bash
+        run: |
+          if [ -n "$CARGO_TARGET" ]; then
+            cargo build --release --manifest-path cli/Cargo.toml --target "$CARGO_TARGET"
+          else
+            cargo build --release --manifest-path cli/Cargo.toml
+          fi
+
+      - name: Publish the GUI
+        run: >-
+          dotnet publish src/PuzzlerGui/PuzzlerGui.csproj
+          -c Release
+          -r ${{ matrix.rid }}
+          --self-contained true
+          -p:Version=${{ env.VERSION }}
+          -o publish
+
+      - name: Stage solver and documents
+        shell: bash
+        run: |
+          if [ -n "$CARGO_TARGET" ]; then
+            SOLVER="cli/target/$CARGO_TARGET/release/puzzler"
+          else
+            SOLVER="cli/target/release/puzzler"
+          fi
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            SOLVER="$SOLVER.exe"
+          fi
+          cp "$SOLVER" publish/
+          cp README.md LICENSE publish/
+          ls -la publish
+
+      - name: Package (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          NAME="puzzler-gui-${VERSION}-${RID}"
+          mkdir -p dist
+          tar -czf "$PWD/dist/${NAME}.tar.gz" -C publish .
+          ls -lh dist
+
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $name = "puzzler-gui-$env:VERSION-$env:RID"
+          New-Item -ItemType Directory -Path dist -Force | Out-Null
+          Compress-Archive -Path publish/* -DestinationPath "dist/$name.zip"
+          Get-ChildItem dist
+
+      - name: Upload archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: puzzler-gui-${{ matrix.rid }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 7
+
+  release:
+    name: Publish GitHub release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download archives
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Generate checksums
+        working-directory: dist
+        run: |
+          sha256sum *.tar.gz *.zip > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: puzzler-gui ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          body: |
+            `puzzler-gui` ${{ github.ref_name }} — a cross-platform desktop
+            front-end for the [`puzzler`](https://github.com/HFunction2013/puzzler)
+            exact-cover solver.
+
+            Each archive is self-contained: it includes the GUI and a matching
+            `puzzler` executable, so no .NET runtime or Rust toolchain is needed.
+            Unpack the archive for your platform and start `PuzzlerGui`
+            (`PuzzlerGui.exe` on Windows).
+
+            Verify the downloads with `SHA256SUMS.txt` attached below.
+          files: |
+            dist/*.tar.gz
+            dist/*.zip
+            dist/SHA256SUMS.txt

@@ -1,0 +1,33 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="PuzzlerGui.Views.AboutWindow"
+        Title="About puzzler-gui"
+        Width="520"
+        Height="340"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="{DynamicResource AppBackground}">
+
+  <StackPanel Margin="28" Spacing="12" VerticalAlignment="Top">
+    <StackPanel Orientation="Horizontal" Spacing="14">
+      <Image Source="avares://PuzzlerGui/Assets/puzzler-gui-256.png" Width="72" Height="72" />
+      <StackPanel VerticalAlignment="Center" Spacing="2">
+        <TextBlock Classes="title" Text="puzzler-gui" />
+        <TextBlock x:Name="VersionText" Classes="hint" Text="Version 0.1.0" />
+      </StackPanel>
+    </StackPanel>
+
+    <TextBlock TextWrapping="Wrap"
+               Text="A cross-platform desktop front-end for the puzzler exact-cover solver. Edit .pzle puzzles visually, run the solver, and browse every distinct tiling." />
+
+    <TextBlock Classes="hint" TextWrapping="Wrap"
+               Text="Built with Avalonia UI and .NET. Solving is delegated to the puzzler command-line program, which ships with the release archives." />
+
+    <TextBlock Classes="hint" TextWrapping="Wrap"
+               Text="https://github.com/HFunction2013/puzzler-gui" />
+
+    <Button Content="Close" HorizontalAlignment="Right" MinWidth="88"
+            HorizontalContentAlignment="Center" Click="OnCloseClick" />
+  </StackPanel>
+</Window>

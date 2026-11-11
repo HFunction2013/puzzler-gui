@@ -10,7 +10,7 @@ public sealed partial class AboutWindow : Window
     {
         InitializeComponent();
         var version = Assembly.GetExecutingAssembly().GetName().Version;
-        VersionText.Text = version is null ? "Version 0.1.1" : $"Version {version.ToString(3)}";
+        VersionText.Text = version is null ? "Version 0.1.2" : $"Version {version.ToString(3)}";
     }
 
     private void OnCloseClick(object? sender, RoutedEventArgs e) => Close();

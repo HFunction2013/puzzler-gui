@@ -806,10 +806,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
         try
         {
-            var json = JsonSerializer.Serialize(
-                _lastReport,
-                new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(path, json + Environment.NewLine);
+            File.WriteAllText(path, RenderReportJson(_lastReport, _lastJson, _compressJson));
+
             StatusText = $"Exported {Path.GetFileName(path)}";
             return true;
         }
@@ -818,6 +816,22 @@ public sealed partial class MainWindowViewModel : ObservableObject
             error = ex.Message;
             return false;
         }
+    }
+
+    internal static string RenderReportJson(SolveReport? report, string rawJson, bool compressJson)
+    {
+        if (!string.IsNullOrWhiteSpace(rawJson))
+        {
+            return rawJson;
+        }
+
+        if (report is null)
+        {
+            return string.Empty;
+        }
+
+        var options = new JsonSerializerOptions { WriteIndented = !compressJson };
+        return JsonSerializer.Serialize(report, options) + Environment.NewLine;
     }
 
     public void ClearBanner()

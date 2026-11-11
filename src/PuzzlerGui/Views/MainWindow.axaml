@@ -274,6 +274,8 @@
 
               <CheckBox IsChecked="{Binding Dedupe, Mode=TwoWay}"
                         Content="Merge solutions equal under board symmetry" />
+              <CheckBox IsChecked="{Binding CompressJson, Mode=TwoWay}"
+                        Content="Compact JSON report (--compress)" />
 
               <StackPanel Orientation="Horizontal" Spacing="8">
                 <Button Classes="primary" Content="Solve" Command="{Binding SolveCommand}"

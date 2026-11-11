@@ -11,6 +11,8 @@ public sealed class SolveParameters
 
     public bool Dedupe { get; set; } = true;
 
+    public bool CompressJson { get; set; } = true;
+
     public ulong? Seed { get; set; }
 }
 

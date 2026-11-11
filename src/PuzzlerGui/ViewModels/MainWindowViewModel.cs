@@ -59,6 +59,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     private decimal? _timeLimit;
     private decimal? _seedValue;
     private bool _dedupe = true;
+    private bool _compressJson = true;
 
     public MainWindowViewModel(AppSettings settings)
     {
@@ -493,6 +494,12 @@ public sealed partial class MainWindowViewModel : ObservableObject
         set => SetProperty(ref _dedupe, value);
     }
 
+    public bool CompressJson
+    {
+        get => _compressJson;
+        set => SetProperty(ref _compressJson, value);
+    }
+
     public string SolverStatusText
     {
         get
@@ -835,6 +842,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
             NodeLimit = _nodeLimit is > 0 ? (long)_nodeLimit.Value : null,
             TimeLimitSeconds = _timeLimit is > 0 ? (double)_timeLimit.Value : null,
             Dedupe = _dedupe,
+            CompressJson = _compressJson,
             Seed = _seedValue is >= 0 ? (ulong)_seedValue.Value : null,
         };
     }

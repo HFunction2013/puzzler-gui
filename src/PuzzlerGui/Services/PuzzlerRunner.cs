@@ -47,35 +47,7 @@ public sealed class PuzzlerRunner
         {
             await File.WriteAllTextAsync(puzzlePath, PuzzleYaml.Save(document), cancellationToken);
 
-            var arguments = new List<string> { puzzlePath, "--out", reportPath, "--compress" };
-            if (parameters.MaxSolutions is > 0)
-            {
-                arguments.Add("--limit");
-                arguments.Add(parameters.MaxSolutions.Value.ToString(CultureInfo.InvariantCulture));
-            }
-
-            if (parameters.NodeLimit is > 0)
-            {
-                arguments.Add("--nodes");
-                arguments.Add(parameters.NodeLimit.Value.ToString(CultureInfo.InvariantCulture));
-            }
-
-            if (parameters.TimeLimitSeconds is > 0)
-            {
-                arguments.Add("--time");
-                arguments.Add(parameters.TimeLimitSeconds.Value.ToString("0.###", CultureInfo.InvariantCulture));
-            }
-
-            if (!parameters.Dedupe)
-            {
-                arguments.Add("--no-dedupe");
-            }
-
-            if (parameters.Seed is not null)
-            {
-                arguments.Add("--seed");
-                arguments.Add(parameters.Seed.Value.ToString(CultureInfo.InvariantCulture));
-            }
+            var arguments = BuildArguments(parameters, puzzlePath, reportPath);
 
             var run = await RunAsync(executable, arguments, cancellationToken).ConfigureAwait(false);
             stopwatch.Stop();
@@ -161,6 +133,50 @@ public sealed class PuzzlerRunner
         {
             TryDeleteDirectory(workDirectory);
         }
+    }
+
+    internal static List<string> BuildArguments(
+        SolveParameters parameters,
+        string puzzlePath,
+        string reportPath)
+    {
+        var arguments = new List<string> { puzzlePath, "--out", reportPath };
+
+        if (parameters.CompressJson)
+        {
+            arguments.Add("--compress");
+        }
+
+        if (parameters.MaxSolutions is > 0)
+        {
+            arguments.Add("--limit");
+            arguments.Add(parameters.MaxSolutions.Value.ToString(CultureInfo.InvariantCulture));
+        }
+
+        if (parameters.NodeLimit is > 0)
+        {
+            arguments.Add("--nodes");
+            arguments.Add(parameters.NodeLimit.Value.ToString(CultureInfo.InvariantCulture));
+        }
+
+        if (parameters.TimeLimitSeconds is > 0)
+        {
+            arguments.Add("--time");
+            arguments.Add(parameters.TimeLimitSeconds.Value.ToString("0.###", CultureInfo.InvariantCulture));
+        }
+
+        if (!parameters.Dedupe)
+        {
+            arguments.Add("--no-dedupe");
+        }
+
+        if (parameters.Seed is not null)
+        {
+            arguments.Add("--seed");
+            arguments.Add(parameters.Seed.Value.ToString(CultureInfo.InvariantCulture));
+        }
+
+        return arguments;
     }
 
     public async Task<ValidateOutcome> ValidateAsync(PuzzleDocument document, CancellationToken cancellationToken)

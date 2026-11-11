@@ -19,8 +19,9 @@ solver, and flip through every distinct tiling without touching a terminal.
   ASCII board/shape blocks. Saving writes a canonical, human-readable file.
 - **Solver integration** — calls the `puzzler` executable with the current
   puzzle and passes through the solution limit, node limit, time limit, colour
-  seed and symmetry-deduplication switch. The UI stays responsive, shows elapsed
-  time, and can cancel a long search (the whole process tree is killed).
+  seed, symmetry-deduplication switch and the compact-JSON (`--compress`)
+  option. The UI stays responsive, shows elapsed time, and can cancel a long
+  search (the whole process tree is killed).
 - **Solution browser** — every distinct solution is rendered on the solution
   canvas with a colour and number per placement, next to a placement list with
   rotation and flip information. First / previous / next / last navigation plus

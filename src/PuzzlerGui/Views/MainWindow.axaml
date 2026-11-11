@@ -44,8 +44,8 @@
         <MenuItem Header="_Validate with puzzler" Click="OnValidateClick" />
       </MenuItem>
 
-      <MenuItem Header="_Settings">
-        <MenuItem Header="Solver &amp; preferences…" Click="OnSettingsClick" />
+      <MenuItem Header="S_ettings">
+        <MenuItem Header="_Solver &amp; preferences…" Click="OnSettingsClick" />
       </MenuItem>
 
       <MenuItem Header="_View">
@@ -318,18 +318,18 @@
             <Border DockPanel.Dock="Top" Padding="0,0,0,8">
               <Grid ColumnDefinitions="Auto,*,Auto">
                 <StackPanel Orientation="Horizontal" Spacing="6">
-                  <Button Classes="nav" Content="⏮" ToolTip.Tip="First"
+                  <Button Classes="nav" Content="⏮" ToolTip.Tip="First (Home)"
                           Command="{Binding FirstSolutionCommand}" />
-                  <Button Classes="nav" Content="◀" ToolTip.Tip="Previous"
+                  <Button Classes="nav" Content="◀" ToolTip.Tip="Previous (←)"
                           Command="{Binding PreviousSolutionCommand}" />
                   <TextBlock Text="{Binding SolutionIndexLabel}"
                              VerticalAlignment="Center"
                              MinWidth="68"
                              TextAlignment="Center"
                              FontWeight="SemiBold" />
-                  <Button Classes="nav" Content="▶" ToolTip.Tip="Next"
+                  <Button Classes="nav" Content="▶" ToolTip.Tip="Next (→)"
                           Command="{Binding NextSolutionCommand}" />
-                  <Button Classes="nav" Content="⏭" ToolTip.Tip="Last"
+                  <Button Classes="nav" Content="⏭" ToolTip.Tip="Last (End)"
                           Command="{Binding LastSolutionCommand}" />
                 </StackPanel>
                 <TextBlock Grid.Column="1"

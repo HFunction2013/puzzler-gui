@@ -4,6 +4,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
+using Avalonia.VisualTree;
 using PuzzlerGui.Controls;
 using PuzzlerGui.Services;
 using PuzzlerGui.ViewModels;
@@ -81,6 +82,65 @@ public sealed partial class MainWindow : Window
             e.Handled = true;
             ViewModel.CancelSolveCommand.Execute(null);
         }
+        else if (ViewModel.SelectedTabIndex == 1 &&
+                 !e.KeyModifiers.HasFlag(KeyModifiers.Control) &&
+                 !e.KeyModifiers.HasFlag(KeyModifiers.Alt) &&
+                 !e.KeyModifiers.HasFlag(KeyModifiers.Shift) &&
+                 !IsEditingFocusElement(e.Source))
+        {
+            switch (e.Key)
+            {
+                case Key.Left:
+                    if (ViewModel.PreviousSolutionCommand.CanExecute(null))
+                    {
+                        ViewModel.PreviousSolutionCommand.Execute(null);
+                        e.Handled = true;
+                    }
+                    break;
+                case Key.Right:
+                    if (ViewModel.NextSolutionCommand.CanExecute(null))
+                    {
+                        ViewModel.NextSolutionCommand.Execute(null);
+                        e.Handled = true;
+                    }
+                    break;
+                case Key.Home:
+                    if (ViewModel.FirstSolutionCommand.CanExecute(null))
+                    {
+                        ViewModel.FirstSolutionCommand.Execute(null);
+                        e.Handled = true;
+                    }
+                    break;
+                case Key.End:
+                    if (ViewModel.LastSolutionCommand.CanExecute(null))
+                    {
+                        ViewModel.LastSolutionCommand.Execute(null);
+                        e.Handled = true;
+                    }
+                    break;
+            }
+        }
+    }
+
+    private static bool IsEditingFocusElement(object? source)
+    {
+        if (source is not Visual visual)
+        {
+            return false;
+        }
+
+        Visual? current = visual;
+        while (current is not null)
+        {
+            if (current is TextBox or NumericUpDown or ComboBox or ListBox or Menu or MenuItem)
+            {
+                return true;
+            }
+
+            current = current.GetVisualParent();
+        }
+
+        return false;
     }
 
     protected override void OnClosing(WindowClosingEventArgs e)

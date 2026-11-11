@@ -24,8 +24,8 @@ solver, and flip through every distinct tiling without touching a terminal.
   search (the whole process tree is killed).
 - **Solution browser** — every distinct solution is rendered on the solution
   canvas with a colour and number per placement, next to a placement list with
-  rotation and flip information. First / previous / next / last navigation plus
-  JSON export of the full solver report.
+  rotation and flip information. First / previous / next / last navigation with
+  Home / End and ← / → keys, plus JSON export of the full solver report.
 - **Desktop conveniences** — open files by drag and drop or from the command
   line, recent files, Ctrl+N/O/S and Ctrl+Shift+S shortcuts, F5 to solve, Esc to
   cancel, an unsaved-changes prompt, light/dark/system themes, and a settings
@@ -97,6 +97,9 @@ workflow builds the solver from the companion repository
 | `Ctrl+Shift+S` | Save as |
 | `F5` | Solve |
 | `Esc` | Cancel the running search |
+| `←` / `→` | Previous / next solution |
+| `Home` / `End` | First / last solution |
+| `Alt+F` / `Alt+S` / `Alt+E` / `Alt+V` / `Alt+H` | Open File / Solve / Settings / View / Help menu |
 
 ## Puzzle format
 

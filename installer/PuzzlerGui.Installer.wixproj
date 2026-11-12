@@ -1,7 +1,7 @@
 <Project Sdk="WixToolset.Sdk/6.0.2">
 
   <PropertyGroup>
-    <Version>0.1.9</Version>
+    <Version>0.1.10</Version>
     <Platform>x64</Platform>
     <OutputName>puzzler-gui-$(Version)-win-x64</OutputName>
     <PublishDir>../publish</PublishDir>

@@ -22,16 +22,16 @@
         <MenuItem Header="{Binding Strings[menu.saveAs]}" InputGesture="Ctrl+Shift+S" Click="OnSaveAsClick" />
         <Separator />
         <MenuItem Header="{Binding Strings[menu.openSample]}">
-          <MenuItem Header="Dominoes 2×3" Tag="dominoes_2x3.pzle" Click="OnSampleClick" />
-          <MenuItem Header="Four dominoes" Tag="four_dominoes.pzle" Click="OnSampleClick" />
-          <MenuItem Header="No-rotate row" Tag="no_rotate_row.pzle" Click="OnSampleClick" />
-          <MenuItem Header="Chiral L pair" Tag="chiral_l_pair.pzle" Click="OnSampleClick" />
-          <MenuItem Header="Per-piece override" Tag="per_piece_override.pzle" Click="OnSampleClick" />
-          <MenuItem Header="Subset tiling" Tag="subset_tiling.pzle" Click="OnSampleClick" />
-          <MenuItem Header="T board" Tag="t_board.pzle" Click="OnSampleClick" />
-          <MenuItem Header="Ring of L tetrominoes" Tag="ring_l_tetrominoes.pzle" Click="OnSampleClick" />
-          <MenuItem Header="Pentominoes 3×20" Tag="pentomino_3x20.pzle" Click="OnSampleClick" />
-          <MenuItem Header="Pentominoes 6×10 (2,339 solutions)" Tag="pentomino_6x10.pzle" Click="OnSampleClick" />
+          <MenuItem Header="{Binding Strings[sample.dominoes2x3]}" Tag="dominoes_2x3.pzle" Click="OnSampleClick" />
+          <MenuItem Header="{Binding Strings[sample.fourDominoes]}" Tag="four_dominoes.pzle" Click="OnSampleClick" />
+          <MenuItem Header="{Binding Strings[sample.noRotateRow]}" Tag="no_rotate_row.pzle" Click="OnSampleClick" />
+          <MenuItem Header="{Binding Strings[sample.chiralLPair]}" Tag="chiral_l_pair.pzle" Click="OnSampleClick" />
+          <MenuItem Header="{Binding Strings[sample.perPieceOverride]}" Tag="per_piece_override.pzle" Click="OnSampleClick" />
+          <MenuItem Header="{Binding Strings[sample.subsetTiling]}" Tag="subset_tiling.pzle" Click="OnSampleClick" />
+          <MenuItem Header="{Binding Strings[sample.tBoard]}" Tag="t_board.pzle" Click="OnSampleClick" />
+          <MenuItem Header="{Binding Strings[sample.ringLTetrominoes]}" Tag="ring_l_tetrominoes.pzle" Click="OnSampleClick" />
+          <MenuItem Header="{Binding Strings[sample.pentominoes3x20]}" Tag="pentomino_3x20.pzle" Click="OnSampleClick" />
+          <MenuItem Header="{Binding Strings[sample.pentominoes6x10]}" Tag="pentomino_6x10.pzle" Click="OnSampleClick" />
         </MenuItem>
         <Separator />
         <MenuItem Header="{Binding Strings[menu.exit]}" Click="OnExitClick" />

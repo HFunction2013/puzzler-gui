@@ -23,6 +23,9 @@ public sealed class PuzzlerRunner
 
     public string? FindSolver() => LocateSolver(_solverPathProvider());
 
+    private static string L(string key, params object?[] args) =>
+        string.Format(LocalizationService.Instance[key], args);
+
     public async Task<SolveOutcome> SolveAsync(
         PuzzleDocument document,
         SolveParameters parameters,
@@ -34,8 +37,7 @@ public sealed class PuzzlerRunner
             return new SolveOutcome
             {
                 Status = SolveStatus.SolverMissing,
-                Message =
-                    "The `puzzler` executable was not found. Put it next to puzzler-gui or pick it in Settings.",
+                Message = L("banner.solverMissing"),
             };
         }
 
@@ -68,7 +70,7 @@ public sealed class PuzzlerRunner
                         return new SolveOutcome
                         {
                             Status = SolveStatus.Failed,
-                            Message = $"The solver produced an unreadable report: {ex.Message}",
+                            Message = L("runner.unreadableReport", ex.Message),
                             Duration = stopwatch.Elapsed,
                         };
                     }
@@ -90,7 +92,7 @@ public sealed class PuzzlerRunner
                     Status = SolveStatus.NoSolution,
                     Report = report,
                     RawJson = json,
-                    Message = "No solution: the pieces cannot cover this board.",
+                    Message = L("solution.emptyNoSolution"),
                     Duration = stopwatch.Elapsed,
                 },
                 1 => new SolveOutcome
@@ -100,13 +102,13 @@ public sealed class PuzzlerRunner
                     RawJson = json,
                     Message = FirstLine(run.StandardError) is { Length: > 0 } error
                         ? error
-                        : "The puzzle is invalid.",
+                        : L("runner.invalidPuzzle"),
                     Duration = stopwatch.Elapsed,
                 },
                 _ => new SolveOutcome
                 {
                     Status = SolveStatus.Failed,
-                    Message = $"puzzler exited with code {run.ExitCode}: {FirstLine(run.StandardError)}",
+                    Message = L("runner.exitCode", run.ExitCode, FirstLine(run.StandardError)),
                     Duration = stopwatch.Elapsed,
                 },
             };
@@ -116,7 +118,7 @@ public sealed class PuzzlerRunner
             return new SolveOutcome
             {
                 Status = SolveStatus.Cancelled,
-                Message = "Search cancelled.",
+                Message = L("banner.searchCancelled"),
                 Duration = stopwatch.Elapsed,
             };
         }
@@ -125,7 +127,7 @@ public sealed class PuzzlerRunner
             return new SolveOutcome
             {
                 Status = SolveStatus.Failed,
-                Message = $"Could not run puzzler: {ex.Message}",
+                Message = L("runner.couldNotRun", ex.Message),
                 Duration = stopwatch.Elapsed,
             };
         }
@@ -187,7 +189,7 @@ public sealed class PuzzlerRunner
             return new ValidateOutcome
             {
                 IsValid = false,
-                Output = "The `puzzler` executable was not found. Put it next to puzzler-gui or pick it in Settings.",
+                Output = L("banner.solverMissing"),
             };
         }
 
@@ -221,11 +223,11 @@ public sealed class PuzzlerRunner
         }
         catch (OperationCanceledException)
         {
-            return new ValidateOutcome { IsValid = false, Output = "Validation cancelled." };
+            return new ValidateOutcome { IsValid = false, Output = L("runner.validationCancelled") };
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.ComponentModel.Win32Exception)
         {
-            return new ValidateOutcome { IsValid = false, Output = $"Could not run puzzler: {ex.Message}" };
+            return new ValidateOutcome { IsValid = false, Output = L("runner.couldNotRun", ex.Message) };
         }
         finally
         {
@@ -311,7 +313,7 @@ public sealed class PuzzlerRunner
         using var process = new Process { StartInfo = startInfo };
         if (!process.Start())
         {
-            throw new InvalidOperationException("The solver process did not start.");
+            throw new InvalidOperationException(L("runner.processNotStarted"));
         }
 
         var stdoutTask = process.StandardOutput.ReadToEndAsync();

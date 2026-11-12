@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using PuzzlerGui.Services;
 
@@ -22,6 +23,7 @@ public sealed partial class PieceModel : ObservableObject
     private int _colorIndex = 1;
 
     private ShapeModel _shape;
+    private readonly LocalizationService _loc = LocalizationService.Instance;
 
     public PieceModel(string id, ShapeModel shape, int count = 1)
     {
@@ -29,6 +31,7 @@ public sealed partial class PieceModel : ObservableObject
         _shape = shape;
         _count = count;
         _shape.Changed += OnShapeChanged;
+        _loc.PropertyChanged += OnLocalizationChanged;
     }
 
     public ShapeModel Shape
@@ -56,7 +59,7 @@ public sealed partial class PieceModel : ObservableObject
 
     public Avalonia.Media.IBrush Brush => new Avalonia.Media.SolidColorBrush(Palette.ColorFor(ColorIndex));
 
-    public string CellSummary => $"{Area} cell{(Area == 1 ? string.Empty : "s")} × {Count}";
+    public string CellSummary => string.Format(_loc["piece.summary"], Area, Count);
 
     public PieceModel Clone() =>
         new(Id, Shape.Clone(), Count) { CanRotate = CanRotate, CanFlip = CanFlip };
@@ -75,4 +78,7 @@ public sealed partial class PieceModel : ObservableObject
         OnPropertyChanged(nameof(Area));
         OnPropertyChanged(nameof(CellSummary));
     }
+
+    private void OnLocalizationChanged(object? sender, PropertyChangedEventArgs e) =>
+        OnPropertyChanged(nameof(CellSummary));
 }

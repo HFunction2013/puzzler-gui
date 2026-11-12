@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using PuzzlerGui.Services;
 
 namespace PuzzlerGui.Models;
 
@@ -83,35 +84,35 @@ public sealed partial class PuzzleDocument : ObservableObject
 
         if (Board.PlayableCells == 0)
         {
-            errorList.Add("board_shape: the board is empty");
+            errorList.Add(L("validation.boardEmpty"));
         }
 
         if (Pieces.Count == 0)
         {
-            errorList.Add("puzzle: no pieces were defined");
+            errorList.Add(L("validation.noPieces"));
         }
 
         foreach (var piece in Pieces)
         {
             if (piece.Area == 0)
             {
-                errorList.Add($"piece {piece.Id}: the shape is empty");
+                errorList.Add(L("validation.pieceEmptyShape", piece.Id));
                 continue;
             }
 
             if (!piece.Shape.IsConnected())
             {
-                errorList.Add($"piece {piece.Id}: the shape is not 4-connected, so it cannot be a physical piece");
+                errorList.Add(L("validation.pieceDisconnected", piece.Id));
             }
 
             if (piece.Area > Board.PlayableCells)
             {
-                errorList.Add($"piece {piece.Id}: covers {piece.Area} cells but the board only has {Board.PlayableCells}");
+                errorList.Add(L("validation.pieceTooLarge", piece.Id, piece.Area, Board.PlayableCells));
             }
 
             if (piece.Count < 1)
             {
-                errorList.Add($"piece {piece.Id}: count must be at least 1");
+                errorList.Add(L("validation.pieceBadCount", piece.Id));
             }
         }
 
@@ -120,22 +121,17 @@ public sealed partial class PuzzleDocument : ObservableObject
             var total = TotalPieceCells;
             if (total < Board.PlayableCells)
             {
-                errorList.Add(
-                    $"the pieces cover {total} cells but the board needs {Board.PlayableCells}: " +
-                    "no arrangement can fill it");
+                errorList.Add(L("validation.areaShort", total, Board.PlayableCells));
             }
 
             if (AllUse && total != Board.PlayableCells && total >= Board.PlayableCells)
             {
-                errorList.Add(
-                    $"all_use is true, so every piece must be placed, but the pieces cover {total} cells " +
-                    $"while the board has {Board.PlayableCells} (turn off all_use to allow unused pieces)");
+                errorList.Add(L("validation.allUseMismatch", total, Board.PlayableCells));
             }
 
             if (!Board.IsConnected())
             {
-                warningList.Add(
-                    "board_shape: the board is not 4-connected; it will only be solvable if pieces can span the gap");
+                warningList.Add(L("validation.boardDisconnected"));
             }
         }
 
@@ -146,12 +142,15 @@ public sealed partial class PuzzleDocument : ObservableObject
             .ToList();
         if (duplicateIds.Count > 0)
         {
-            warningList.Add($"duplicate piece id(s): {string.Join(", ", duplicateIds)}");
+            warningList.Add(L("validation.duplicateIds", string.Join(", ", duplicateIds)));
         }
 
         errors = errorList;
         warnings = warningList;
     }
+
+    private static string L(string key, params object?[] args) =>
+        string.Format(LocalizationService.Instance[key], args);
 
     private void OnChildChanged(object? sender, EventArgs e) => RaiseChanged();
 

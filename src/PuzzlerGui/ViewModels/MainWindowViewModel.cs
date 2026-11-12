@@ -104,8 +104,10 @@ public sealed partial class MainWindowViewModel : ObservableObject
             OnPropertyChanged(nameof(SolutionIndexLabel));
             OnPropertyChanged(nameof(StatLine));
             OnPropertyChanged(nameof(MultiplicityText));
+            OnPropertyChanged(nameof(ElapsedText));
             ReloadTriStateOptions();
             RefreshLocalizedStatus();
+            RefreshValidation();
             UpdateSolutionView();
         };
 
@@ -113,7 +115,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         _timer.Tick += (_, _) =>
         {
             var elapsed = DateTimeOffset.Now - _solveStarted;
-            ElapsedText = $"{elapsed.TotalSeconds:0.0} s";
+            ElapsedText = string.Format(Loc["stat.elapsedSeconds"], elapsed.TotalSeconds);
         };
     }
 
@@ -801,7 +803,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         _solveRevision = _revision;
         _solveCancellation = new CancellationTokenSource();
         _solveStarted = DateTimeOffset.Now;
-        ElapsedText = "0.0 s";
+        ElapsedText = string.Format(Loc["stat.elapsedSeconds"], 0.0);
         IsSolving = true;
         StatusText = Loc["status.solving"];
         _timer.Start();
@@ -846,24 +848,24 @@ public sealed partial class MainWindowViewModel : ObservableObject
             case SolveStatus.NoSolution:
                 ApplyReport(outcome);
                 StatusText = Loc["status.noSolution"];
-                SetBanner(BannerKind.Warning, outcome.Message);
+                SetBanner(BannerKind.Warning, LocalizeOutcomeMessage(outcome));
                 SelectedTabIndex = 1;
                 break;
 
             case SolveStatus.Cancelled:
                 StatusText = Loc["status.cancelled"];
-                SetBanner(BannerKind.Info, Loc["banner.searchCancelled"]);
+                SetBanner(BannerKind.Info, LocalizeOutcomeMessage(outcome));
                 break;
 
             case SolveStatus.SolverMissing:
-                SetBanner(BannerKind.Error, outcome.Message);
+                SetBanner(BannerKind.Error, LocalizeOutcomeMessage(outcome));
                 break;
 
             case SolveStatus.InvalidPuzzle:
             case SolveStatus.Failed:
             default:
                 StatusText = Loc["status.solveFailed"];
-                SetBanner(BannerKind.Error, outcome.Message);
+                SetBanner(BannerKind.Error, LocalizeOutcomeMessage(outcome));
                 break;
         }
     }
@@ -883,6 +885,13 @@ public sealed partial class MainWindowViewModel : ObservableObject
     private async Task ValidateWithSolverAsync()
     {
         ClearBanner();
+        if (!SolverFound)
+        {
+            SetBanner(BannerKind.Error, Loc["banner.solverMissing"]);
+            StatusText = Loc["status.solveFailed"];
+            return;
+        }
+
         var outcome = await _runner.ValidateAsync(_document, CancellationToken.None);
         SetBanner(
             outcome.IsValid ? BannerKind.Success : BannerKind.Error,
@@ -953,6 +962,36 @@ public sealed partial class MainWindowViewModel : ObservableObject
     {
         BannerKind = kind;
         BannerText = text;
+    }
+
+    private string LocalizeOutcomeMessage(SolveOutcome outcome) => outcome.Status switch
+    {
+        SolveStatus.NoSolution => Loc["solution.emptyNoSolution"],
+        SolveStatus.Cancelled => Loc["banner.searchCancelled"],
+        SolveStatus.SolverMissing => Loc["banner.solverMissing"],
+        SolveStatus.InvalidPuzzle => string.IsNullOrWhiteSpace(outcome.Message)
+            ? Loc["runner.invalidPuzzle"]
+            : outcome.Message,
+        SolveStatus.Failed => string.IsNullOrWhiteSpace(outcome.Message)
+            ? Loc["status.solveFailed"]
+            : outcome.Message,
+        _ => outcome.Message,
+    };
+
+    private void RefreshOutcomeBanner()
+    {
+        if (_lastOutcome is null || _lastOutcome.Status == SolveStatus.Success)
+        {
+            return;
+        }
+
+        var kind = _lastOutcome.Status switch
+        {
+            SolveStatus.NoSolution => BannerKind.Warning,
+            SolveStatus.Cancelled => BannerKind.Info,
+            _ => BannerKind.Error,
+        };
+        SetBanner(kind, LocalizeOutcomeMessage(_lastOutcome));
     }
 
     // ------------------------------------------------------------- internals
@@ -1181,7 +1220,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
             stats.Solutions == 1 ? Loc["status.solutionsCountOne"] : string.Format(Loc["status.solutionsCount"], stats.Solutions),
             string.Format(Loc["stat.rawLayouts"], stats.RawSolutions),
             string.Format(Loc["stat.nodes"], stats.Nodes),
-            $"{stats.ElapsedMs / 1000:0.00} s",
+            $"{stats.ElapsedMs / 1000:0.00} {Loc["stat.secondsSuffix"]}",
         };
         if (stats.Truncated)
         {
@@ -1285,6 +1324,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         }
 
         UpdateSolverStatus();
+        RefreshOutcomeBanner();
         if (_lastOutcome is not null)
         {
             RebuildStatistics(_lastOutcome);

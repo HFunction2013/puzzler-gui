@@ -1,0 +1,33 @@
+<Project Sdk="WixToolset.Sdk/6.0.2">
+
+  <PropertyGroup>
+    <Version>0.1.4</Version>
+    <Platform>x64</Platform>
+    <OutputName>puzzler-gui-$(Version)-win-x64</OutputName>
+    <PublishDir>../publish</PublishDir>
+    <DefineConstants>Version=$(Version);PublishDir=$(PublishDir)</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Heat" Version="6.0.2" />
+    <PackageReference Include="WixToolset.UI.wixext" Version="6.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="puzzler-gui.ico" />
+    <Content Include="LICENSE.rtf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <HarvestDirectory Include="$(PublishDir)">
+      <ComponentGroupName>AppFiles</ComponentGroupName>
+      <DirectoryRefId>INSTALLFOLDER</DirectoryRefId>
+      <PreprocessorVariable>PublishDir</PreprocessorVariable>
+      <SuppressRootDirectory>true</SuppressRootDirectory>
+      <SuppressCom>true</SuppressCom>
+      <SuppressRegistry>true</SuppressRegistry>
+    </HarvestDirectory>
+    <BindPath Include="$(PublishDir)" />
+  </ItemGroup>
+
+</Project>

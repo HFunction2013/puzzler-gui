@@ -82,9 +82,11 @@ Tagged builds (`v*`) publish self-contained archives for:
 | macOS Intel | `osx-x64` |
 | macOS Apple silicon | `osx-arm64` |
 
-Each archive contains the GUI, the `puzzler` solver for that platform, the
-sample puzzles and `SHA256SUMS.txt` is attached to the release. The release
-workflow builds the solver from the companion repository
+Each archive contains the GUI, the `puzzler` solver for that platform, and the
+sample puzzles. Windows x64 also ships an MSI installer that lets you choose the
+install location, create optional Start Menu and Desktop shortcuts, and register
+`.pzle` files with `puzzler-gui`. `SHA256SUMS.txt` is attached to every release.
+The release workflow builds the solver from the companion repository
 [HFunction2013/puzzler](https://github.com/HFunction2013/puzzler).
 
 ## Keyboard shortcuts

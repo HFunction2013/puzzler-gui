@@ -14,7 +14,7 @@
       <Image Source="avares://PuzzlerGui/Assets/puzzler-gui-256.png" Width="72" Height="72" />
       <StackPanel VerticalAlignment="Center" Spacing="2">
         <TextBlock Classes="title" Text="puzzler-gui" />
-        <TextBlock x:Name="VersionText" Classes="hint" Text="Version 0.1.3" />
+        <TextBlock x:Name="VersionText" Classes="hint" Text="Version 0.1.4" />
       </StackPanel>
     </StackPanel>
 

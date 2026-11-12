@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+
+  <Package Name="puzzler-gui"
+           Manufacturer="HFunction2013"
+           Version="$(var.Version)"
+           UpgradeCode="01b9f2c3-20a4-478f-8462-f1e0ed6007f0"
+           Language="1033"
+           Scope="perMachine"
+           Compressed="true">
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of puzzler-gui is already installed." />
+    <Media Id="1" EmbedCab="yes" Cabinet="app.cab" />
+
+    <ui:WixUI Id="WixUI_Mondo" InstallDirectory="INSTALLFOLDER" />
+    <WixVariable Id="WixUILicenseRtf" Value="LICENSE.rtf" />
+
+    <Icon Id="AppIcon" SourceFile="puzzler-gui.ico" />
+
+    <Feature Id="Main" Title="puzzler-gui" Description="The GUI application and puzzler solver." Level="1" ConfigurableDirectory="INSTALLFOLDER">
+      <ComponentGroupRef Id="AppFiles" />
+      <ComponentRef Id="FileAssociation" />
+    </Feature>
+
+    <Feature Id="StartMenuShortcut" Title="Start Menu shortcut" Description="Create a shortcut in the Start Menu." Level="1">
+      <ComponentRef Id="StartMenuShortcut" />
+    </Feature>
+
+    <Feature Id="DesktopShortcut" Title="Desktop shortcut" Description="Create a shortcut on the desktop." Level="1">
+      <ComponentRef Id="DesktopShortcut" />
+    </Feature>
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="puzzler-gui" />
+    </StandardDirectory>
+
+    <DirectoryRef Id="INSTALLFOLDER">
+      <Component Id="FileAssociation" Guid="4bc4e6bd-0eed-4ffc-b3a9-730f24a8f6f8">
+        <RegistryValue Root="HKCU"
+                       Key="Software\HFunction2013\puzzler-gui"
+                       Name="FileAssociation"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes" />
+        <RegistryKey Root="HKCR" Key=".pzle" Action="create">
+          <RegistryValue Value="PuzzlerGui.PuzzleFile" Type="string" />
+        </RegistryKey>
+        <RegistryKey Root="HKCR" Key="PuzzlerGui.PuzzleFile" Action="create">
+          <RegistryValue Name="FriendlyTypeName" Value="puzzler puzzle file" Type="string" />
+          <RegistryValue Name="DefaultIcon" Value="[INSTALLFOLDER]puzzler-gui.ico,0" Type="string" />
+          <RegistryKey Key="shell\open\command" Action="create">
+            <RegistryValue Value="&quot;[INSTALLFOLDER]PuzzlerGui.exe&quot; &quot;%1&quot;" Type="string" />
+          </RegistryKey>
+        </RegistryKey>
+      </Component>
+    </DirectoryRef>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ProgramMenuDir" Name="puzzler-gui" />
+      <Component Id="StartMenuShortcut" Guid="d5a8b62f-dea0-4014-bbcc-bd7e5a7e5229">
+        <RegistryValue Root="HKCU"
+                       Key="Software\HFunction2013\puzzler-gui"
+                       Name="StartMenuShortcut"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes" />
+        <Shortcut Id="StartMenuShortcut"
+                  Directory="ProgramMenuDir"
+                  Name="puzzler-gui"
+                  Target="[INSTALLFOLDER]PuzzlerGui.exe"
+                  WorkingDirectory="INSTALLFOLDER"
+                  Icon="AppIcon" />
+        <RemoveFolder Id="RemoveProgramMenuDir" Directory="ProgramMenuDir" On="uninstall" />
+      </Component>
+    </StandardDirectory>
+
+    <StandardDirectory Id="DesktopFolder">
+      <Component Id="DesktopShortcut" Guid="099e0356-f959-415e-ab7c-8b089ba66430">
+        <RegistryValue Root="HKCU"
+                       Key="Software\HFunction2013\puzzler-gui"
+                       Name="DesktopShortcut"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes" />
+        <Shortcut Id="DesktopShortcut"
+                  Directory="DesktopFolder"
+                  Name="puzzler-gui"
+                  Target="[INSTALLFOLDER]PuzzlerGui.exe"
+                  WorkingDirectory="INSTALLFOLDER"
+                  Icon="AppIcon" />
+      </Component>
+    </StandardDirectory>
+
+  </Package>
+
+</Wix>

@@ -9,7 +9,7 @@ on:
       version:
         description: Version to stamp into the build (without a leading v)
         required: false
-        default: '0.1.0'
+        default: '0.1.4'
 
 permissions:
   contents: write
@@ -54,7 +54,7 @@ jobs:
             VERSION="${GITHUB_REF_NAME#v}"
           else
             VERSION="${{ github.event.inputs.version }}"
-            if [ -z "$VERSION" ]; then VERSION="0.1.0"; fi
+            if [ -z "$VERSION" ]; then VERSION="0.1.4"; fi
           fi
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "Building puzzler-gui $VERSION for $RID"
@@ -93,6 +93,8 @@ jobs:
           -r ${{ matrix.rid }}
           --self-contained true
           -p:Version=${{ env.VERSION }}
+          -p:DebugType=none
+          -p:DebugSymbols=false
           -o publish
 
       - name: Stage solver and documents
@@ -108,6 +110,10 @@ jobs:
           fi
           cp "$SOLVER" publish/
           cp README.md LICENSE publish/
+          cp src/PuzzlerGui/Assets/puzzler-gui.ico publish/
+
+          # Keep release archives clean: no debug symbols or XML documentation.
+          find publish -type f \( -name '*.pdb' -o -name '*.xml' \) -delete
           ls -la publish
 
       - name: Package (Unix)
@@ -126,6 +132,13 @@ jobs:
           $name = "puzzler-gui-$env:VERSION-$env:RID"
           New-Item -ItemType Directory -Path dist -Force | Out-Null
           Compress-Archive -Path publish/* -DestinationPath "dist/$name.zip"
+
+          dotnet build installer/PuzzlerGui.Installer.wixproj `
+            -c Release `
+            -p:Version=$env:VERSION `
+            -p:Platform=x64
+          $msi = Get-ChildItem installer -Recurse -Filter '*.msi' | Select-Object -First 1
+          Copy-Item $msi.FullName "dist/$($msi.Name)"
           Get-ChildItem dist
 
       - name: Upload archive
@@ -151,7 +164,7 @@ jobs:
       - name: Generate checksums
         working-directory: dist
         run: |
-          sha256sum *.tar.gz *.zip > SHA256SUMS.txt
+          sha256sum *.tar.gz *.zip *.msi > SHA256SUMS.txt
           cat SHA256SUMS.txt
 
       - name: Publish release
@@ -169,10 +182,13 @@ jobs:
             Each archive is self-contained: it includes the GUI and a matching
             `puzzler` executable, so no .NET runtime or Rust toolchain is needed.
             Unpack the archive for your platform and start `PuzzlerGui`
-            (`PuzzlerGui.exe` on Windows).
+            (`PuzzlerGui.exe` on Windows). Windows x64 also has an MSI installer
+            that supports a custom install folder, optional shortcuts, and
+            opening `.pzle` files from Explorer.
 
             Verify the downloads with `SHA256SUMS.txt` attached below.
           files: |
             dist/*.tar.gz
             dist/*.zip
+            dist/*.msi
             dist/SHA256SUMS.txt

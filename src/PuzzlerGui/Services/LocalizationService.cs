@@ -31,6 +31,8 @@ public sealed partial class LocalizationService : ObservableObject
     public void Apply(string? languageCode)
     {
         CurrentLanguage = IsSupported(languageCode) ? languageCode! : Detect();
+        OnPropertyChanged(nameof(Strings));
+        OnPropertyChanged("Item[]");
     }
 
     public void SetLanguage(string code)

@@ -46,12 +46,14 @@ public sealed class LocalizationTests
     public void SetLanguage_RefreshesViewModelLocalizedBindings()
     {
         var service = LocalizationService.Instance;
+        service.SetLanguage("en");
         var viewModel = new MainWindowViewModel(new AppSettings { Language = "en" });
         var notified = new HashSet<string?>();
         viewModel.PropertyChanged += (_, args) => notified.Add(args.PropertyName);
 
         service.SetLanguage("zh-CN");
 
+        Assert.Equal("zh-CN", service.CurrentLanguage);
         Assert.Equal(service.Strings["puzzle.section"], viewModel.Strings["puzzle.section"]);
         Assert.Contains(nameof(MainWindowViewModel.Strings), notified);
         Assert.Contains("Item[]", notified);

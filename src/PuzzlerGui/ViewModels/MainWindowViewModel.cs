@@ -69,6 +69,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     public MainWindowViewModel(AppSettings settings)
     {
         Settings = settings;
+        Loc.Apply(settings.Language);
         _runner = new PuzzlerRunner(() => Settings.SolverPath);
         _document = PuzzleDocument.CreateDefault();
         _document.Changed += OnDocumentChanged;
@@ -80,6 +81,18 @@ public sealed partial class MainWindowViewModel : ObservableObject
         RefreshDocumentState(markDirty: false);
         _baseline = CaptureSnapshot();
         UpdateSolverStatus();
+        StatusText = Loc["status.ready"];
+        ValidationText = Loc["solver.validationFallback"];
+        Loc.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName is nameof(LocalizationService.Strings) or "Item[]")
+            {
+                OnPropertyChanged(nameof(BoardSummary));
+                OnPropertyChanged(nameof(EmptyHintText));
+                OnPropertyChanged(nameof(SolutionsTabHeader));
+                OnPropertyChanged(nameof(SolverStatusText));
+            }
+        };
 
         _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
         _timer.Tick += (_, _) =>
@@ -90,6 +103,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
     }
 
     public AppSettings Settings { get; }
+
+    public LocalizationService Loc => LocalizationService.Instance;
 
     public IReadOnlyList<TriState> TriStateOptions { get; }
 
@@ -376,9 +391,9 @@ public sealed partial class MainWindowViewModel : ObservableObject
     }
 
     public string BoardSummary =>
-        $"{_document.Board.Width} × {_document.Board.Height} board  ·  " +
-        $"{_document.Board.PlayableCells} playable cells  ·  " +
-        $"{_document.TotalPieceCells} cells across {_document.PieceTypes} piece type(s)";
+        $"{_document.Board.Width} × {_document.Board.Height} {Loc["board.summaryBoard"]}  ·  " +
+        $"{_document.Board.PlayableCells} {Loc["board.playableCells"]}  ·  " +
+        $"{_document.TotalPieceCells} cells across {_document.PieceTypes} {Loc["board.pieceTypes"]}";
 
     public bool ValidationValid
     {
@@ -438,11 +453,13 @@ public sealed partial class MainWindowViewModel : ObservableObject
     public bool EmptyHintVisible => !HasSolutions;
 
     public string EmptyHintText => _lastReport is null
-        ? "Run the solver to explore every distinct tiling of this board."
-        : "No solution: the pieces cannot cover this board.";
+        ? Loc["solution.emptyNoReport"]
+        : Loc["solution.emptyNoSolution"];
 
     public string SolutionsTabHeader =>
-        _solutionCount > 0 ? $"Solutions ({_solutionCount})" : "Solutions";
+        _solutionCount > 0
+            ? string.Format(Loc["solution.tabCount"], _solutionCount)
+            : Loc["tab.solutions"];
 
     public int SelectedSolutionIndex
     {
@@ -517,7 +534,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         get
         {
             var solver = _runner.FindSolver();
-            return solver is null ? "Solver not found — open Settings" : "Solver ready";
+            return solver is null ? Loc["solver.notFound"] : Loc["solver.ready"];
         }
     }
 
@@ -540,7 +557,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     {
         SetDocument(PuzzleDocument.CreateDefault(), null);
         ClearRecovery();
-        StatusText = "New puzzle";
+        StatusText = Loc["status.newPuzzle"];
         ClearBanner();
     }
 
@@ -553,7 +570,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
             var document = PuzzleYaml.Load(text);
             SetDocument(document, Path.GetFullPath(path));
             ClearRecovery();
-            StatusText = $"Opened {Path.GetFileName(path)}";
+            StatusText = string.Format(Loc["status.opened"], Path.GetFileName(path));
             ClearBanner();
             AddRecent(path);
             return true;
@@ -579,7 +596,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
             CurrentFilePath = Path.GetFullPath(path);
             IsDirty = false;
             ClearRecovery();
-            StatusText = $"Saved {Path.GetFileName(path)}";
+            StatusText = string.Format(Loc["status.saved"], Path.GetFileName(path));
             AddRecent(path);
             return true;
         }
@@ -628,7 +645,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         {
             SetDocument(PuzzleYaml.Load(text), null);
             ClearRecovery();
-            StatusText = "Restored the recovered puzzle";
+            StatusText = Loc["status.restored"];
             ClearBanner();
             return true;
         }
@@ -661,7 +678,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         var previous = _undoStack.Pop();
         _redoStack.Push(current);
         ApplySnapshot(previous);
-        StatusText = "Undid last change";
+        StatusText = Loc["status.undo"];
     }
 
     [RelayCommand(CanExecute = nameof(CanRedo))]
@@ -676,7 +693,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         var next = _redoStack.Pop();
         _undoStack.Push(current);
         ApplySnapshot(next);
-        StatusText = "Redid change";
+        StatusText = Loc["status.redo"];
     }
 
     [RelayCommand]
@@ -697,7 +714,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         var piece = new PieceModel($"piece{index}", ShapeModel.FromText("##"));
         _document.Pieces.Add(piece);
         SelectedPiece = piece;
-        StatusText = "Piece added";
+        StatusText = Loc["status.pieceAdded"];
     }
 
     [RelayCommand(CanExecute = nameof(HasSelectedPiece))]
@@ -713,7 +730,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         SelectedPiece = _document.Pieces.Count == 0
             ? null
             : _document.Pieces[Math.Clamp(index, 0, _document.Pieces.Count - 1)];
-        StatusText = "Piece removed";
+        StatusText = Loc["status.pieceRemoved"];
     }
 
     [RelayCommand(CanExecute = nameof(HasSelectedPiece))]
@@ -753,14 +770,13 @@ public sealed partial class MainWindowViewModel : ObservableObject
         _document.Validate(out var errors, out var warnings);
         if (errors.Count > 0)
         {
-            SetBanner(BannerKind.Error, "Fix the validation errors before solving: " + errors[0]);
+            SetBanner(BannerKind.Error, string.Format(Loc["banner.fixErrors"], errors[0]));
             return;
         }
 
         if (!SolverFound)
         {
-            SetBanner(BannerKind.Error,
-                "The puzzler executable was not found. Put it next to puzzler-gui or choose it in Settings.");
+            SetBanner(BannerKind.Error, Loc["banner.solverMissing"]);
             return;
         }
 
@@ -770,7 +786,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         _solveStarted = DateTimeOffset.Now;
         ElapsedText = "0.0 s";
         IsSolving = true;
-        StatusText = "Solving…";
+        StatusText = Loc["status.solving"];
         _timer.Start();
 
         SolveOutcome outcome;
@@ -791,17 +807,20 @@ public sealed partial class MainWindowViewModel : ObservableObject
             case SolveStatus.Success:
                 ApplyReport(outcome);
                 var count = outcome.Report?.Solutions.Count ?? 0;
-                StatusText =
-                    $"{(count == 1 ? "1 solution" : $"{count:N0} solutions")} in {outcome.Duration.TotalSeconds:0.00} s";
+                var countText = count == 1
+                    ? Loc["status.solutionsCountOne"]
+                    : string.Format(Loc["status.solutionsCount"], count);
+                StatusText = $"{countText} — {string.Format(Loc["stat.solvedIn"], outcome.Duration.TotalSeconds)}";
                 if (outcome.Report?.Stats.Truncated == true)
                 {
-                    SetBanner(BannerKind.Warning,
-                        "The search was truncated by a limit; raise the limits to enumerate every tiling.");
+                    SetBanner(BannerKind.Warning, Loc["banner.truncated"]);
                 }
                 else
                 {
                     SetBanner(BannerKind.Success,
-                        $"Solved: {(count == 1 ? "1 distinct solution" : $"{count:N0} distinct solutions")}.");
+                        count == 1
+                            ? Loc["banner.solvedOne"]
+                            : string.Format(Loc["banner.solved"], count));
                 }
 
                 SelectedTabIndex = 1;
@@ -809,14 +828,14 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
             case SolveStatus.NoSolution:
                 ApplyReport(outcome);
-                StatusText = "No solution";
+                StatusText = Loc["status.noSolution"];
                 SetBanner(BannerKind.Warning, outcome.Message);
                 SelectedTabIndex = 1;
                 break;
 
             case SolveStatus.Cancelled:
-                StatusText = "Cancelled";
-                SetBanner(BannerKind.Info, "Search cancelled.");
+                StatusText = Loc["status.cancelled"];
+                SetBanner(BannerKind.Info, Loc["banner.searchCancelled"]);
                 break;
 
             case SolveStatus.SolverMissing:
@@ -826,7 +845,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
             case SolveStatus.InvalidPuzzle:
             case SolveStatus.Failed:
             default:
-                StatusText = "Solve failed";
+                StatusText = Loc["status.solveFailed"];
                 SetBanner(BannerKind.Error, outcome.Message);
                 break;
         }
@@ -838,7 +857,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     private void CancelSolve()
     {
         _solveCancellation?.Cancel();
-        StatusText = "Cancelling…";
+        StatusText = Loc["status.cancelling"];
     }
 
     private bool CanCancel() => _isSolving;
@@ -850,8 +869,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
         var outcome = await _runner.ValidateAsync(_document, CancellationToken.None);
         SetBanner(
             outcome.IsValid ? BannerKind.Success : BannerKind.Error,
-            outcome.IsValid ? "puzzler accepted the puzzle." : outcome.Output);
-        StatusText = outcome.IsValid ? "Validation passed" : "Validation failed";
+            outcome.IsValid ? Loc["banner.validationAccepted"] : outcome.Output);
+        StatusText = outcome.IsValid ? Loc["status.validationPassed"] : Loc["status.validationFailed"];
     }
 
     [RelayCommand(CanExecute = nameof(CanGoPrevious))]
@@ -873,7 +892,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         error = null;
         if (_lastReport is null)
         {
-            error = "There is no solve report to export yet.";
+            error = Loc["export.noReport"];
             return false;
         }
 
@@ -881,7 +900,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         {
             File.WriteAllText(path, RenderReportJson(_lastReport, _lastJson, _compressJson));
 
-            StatusText = $"Exported {Path.GetFileName(path)}";
+            StatusText = string.Format(Loc["status.exported"], Path.GetFileName(path));
             return true;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
@@ -1082,7 +1101,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
             ValidationText = string.Join(Environment.NewLine, errors.Take(3));
             if (errors.Count > 3)
             {
-                ValidationText += $"{Environment.NewLine}…and {errors.Count - 3} more.";
+                ValidationText += $"{Environment.NewLine}{string.Format(Loc["status.moreErrors"], errors.Count - 3)}";
             }
         }
         else if (warnings.Count > 0)
@@ -1093,7 +1112,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         else
         {
             ValidationValid = true;
-            ValidationText = "Puzzle looks valid.";
+            ValidationText = Loc["solver.validationFallback"];
         }
     }
 
@@ -1133,26 +1152,26 @@ public sealed partial class MainWindowViewModel : ObservableObject
         var report = outcome.Report;
         if (report is null)
         {
-            StatLine = $"Solved in {outcome.Duration.TotalSeconds:0.00} s";
+            StatLine = string.Format(Loc["stat.solvedIn"], outcome.Duration.TotalSeconds);
             return;
         }
 
         var stats = report.Stats;
         var parts = new List<string>
         {
-            stats.Solutions == 1 ? "1 solution" : $"{stats.Solutions:N0} solutions",
-            $"{stats.RawSolutions:N0} raw layouts",
-            $"{stats.Nodes:N0} nodes",
+            stats.Solutions == 1 ? Loc["status.solutionsCountOne"] : string.Format(Loc["status.solutionsCount"], stats.Solutions),
+            string.Format(Loc["stat.rawLayouts"], stats.RawSolutions),
+            string.Format(Loc["stat.nodes"], stats.Nodes),
             $"{stats.ElapsedMs / 1000:0.00} s",
         };
         if (stats.Truncated)
         {
-            parts.Add("truncated");
+            parts.Add(Loc["stat.truncated"]);
         }
 
         if (stats.SymmetryGroup > 1)
         {
-            parts.Add($"{stats.SymmetryGroup} board symmetries");
+            parts.Add(string.Format(Loc["stat.symmetries"], stats.SymmetryGroup));
         }
 
         StatLine = string.Join("  ·  ", parts);
@@ -1211,16 +1230,17 @@ public sealed partial class MainWindowViewModel : ObservableObject
             }
 
             Placements.Add(new PlacementRow(
-                $"{Placements.Count + 1}.  {placement.Piece}   ·   {placement.Cells.Length} cells" +
+                $"{Placements.Count + 1}.  {placement.Piece}   ·   " +
+                string.Format(Loc["placement.cells"], placement.Cells.Length) +
                 $"   ·   {placement.RotationDegrees}°" +
-                (placement.Flipped ? "   ·   flipped" : string.Empty),
+                (placement.Flipped ? $"   ·   {Loc["placement.flipped"]}" : string.Empty),
                 new SolidColorBrush(Palette.ColorFor(color))));
         }
 
         SolutionSurface = new GridData(width, height, cells, labels, Palette.All);
         MultiplicityText = solution.SymmetryMultiplicity > 1
-            ? $"Represents {solution.SymmetryMultiplicity} board-symmetric layouts."
-            : "Unique under the board symmetries.";
+            ? string.Format(Loc["placement.represents"], solution.SymmetryMultiplicity)
+            : Loc["placement.unique"];
     }
 
     private void UpdateSolverStatus()

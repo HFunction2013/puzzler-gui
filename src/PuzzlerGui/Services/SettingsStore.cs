@@ -14,6 +14,10 @@ public sealed class AppSettings
     /// <summary>"System", "Light" or "Dark".</summary>
     [JsonPropertyName("theme")]
     public string Theme { get; set; } = "System";
+
+    /// <summary>"en", "zh-CN", "zh-TW" or "ja". Empty follows the system locale.</summary>
+    [JsonPropertyName("language")]
+    public string Language { get; set; } = string.Empty;
 }
 
 public static class SettingsStore

@@ -7,26 +7,37 @@ namespace PuzzlerGui.Views;
 
 public sealed partial class SettingsWindow : Window
 {
+    public LocalizationService Loc { get; }
+
     public SettingsWindow()
-        : this(null)
+        : this(new AppSettings())
     {
     }
 
-    public SettingsWindow(string? solverPath)
+    public SettingsWindow(AppSettings settings)
     {
+        Loc = LocalizationService.Instance;
         InitializeComponent();
-        PathBox.Text = solverPath ?? string.Empty;
+        DataContext = this;
+
+        PathBox.Text = settings.SolverPath ?? string.Empty;
+        LanguageBox.ItemsSource = Loc.Languages;
+        LanguageBox.SelectedItem = Loc.Languages.FirstOrDefault(option => option.Code == Loc.CurrentLanguage)
+            ?? Loc.Languages[0];
         UpdateStatus();
     }
 
     public string? SolverPath =>
         string.IsNullOrWhiteSpace(PathBox.Text) ? null : PathBox.Text!.Trim();
 
+    public string SelectedLanguageCode =>
+        (LanguageBox.SelectedItem as LanguageOption)?.Code ?? Loc.CurrentLanguage;
+
     private async void OnBrowseClick(object? sender, RoutedEventArgs e)
     {
         var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title = "Select the puzzler executable",
+            Title = Loc["dialog.solverPickerTitle"],
             AllowMultiple = false,
             FileTypeFilter = new[]
             {
@@ -58,7 +69,7 @@ public sealed partial class SettingsWindow : Window
         if (found is null)
         {
             PathBox.Text = string.Empty;
-            StatusText.Text = "No puzzler executable was found next to the app or on PATH.";
+            StatusText.Text = Loc["dialog.solverNotFound"];
             return;
         }
 
@@ -70,8 +81,8 @@ public sealed partial class SettingsWindow : Window
     {
         var found = PuzzlerRunner.LocateSolver(SolverPath);
         StatusText.Text = found is null
-            ? "Not found — put puzzler next to puzzler-gui, or browse to the binary."
-            : $"Found: {found}";
+            ? Loc["dialog.solverNotFound"]
+            : string.Format(Loc["dialog.solverFound"], found);
     }
 
     private void OnOkClick(object? sender, RoutedEventArgs e) => Close(true);

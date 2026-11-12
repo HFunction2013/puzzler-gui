@@ -41,6 +41,8 @@ public sealed partial class MainWindow : Window
 
     private MainWindowViewModel ViewModel => (MainWindowViewModel)DataContext!;
 
+    private LocalizationService Loc => LocalizationService.Instance;
+
     public void OpenFile(string path) => _ = OpenPathAsync(path, confirmDiscard: false);
 
     public async Task AskRestoreRecoveryAsync()
@@ -52,8 +54,11 @@ public sealed partial class MainWindow : Window
         }
 
         var result = await new MessageDialog(
-            "Recover puzzle",
-            "An unsaved puzzle was found from the previous session. Restore it?",
+            Loc["dialog.restoreTitle"],
+            Loc["dialog.restoreMessage"],
+            Loc["dialog.restore"],
+            Loc["dialog.discard"],
+            Loc["dialog.cancel"],
             "Restore",
             "Discard",
             "Cancel").ShowAsync(this);
@@ -247,8 +252,11 @@ public sealed partial class MainWindow : Window
         }
 
         var result = await new MessageDialog(
-            "Unsaved changes",
-            $"\u201c{viewModel.CurrentFileName}\u201d has unsaved changes. Save them before continuing?",
+            Loc["dialog.unsavedTitle"],
+            string.Format(Loc["dialog.unsavedMessage"], viewModel.CurrentFileName),
+            Loc["dialog.save"],
+            Loc["dialog.discard"],
+            Loc["dialog.cancel"],
             "Save",
             "Discard",
             "Cancel").ShowAsync(this);
@@ -421,16 +429,17 @@ public sealed partial class MainWindow : Window
 
     private async void OnSettingsClick(object? sender, RoutedEventArgs e)
     {
-        var dialog = new SettingsWindow(ViewModel.Settings.SolverPath);
+        var dialog = new SettingsWindow(ViewModel.Settings);
         var accepted = await dialog.ShowDialog<bool>(this);
         if (accepted)
         {
             ViewModel.SetSolverPath(dialog.SolverPath);
+            ViewModel.Settings.Language = dialog.SelectedLanguageCode;
+            Loc.SetLanguage(dialog.SelectedLanguageCode);
+            SettingsStore.Save(ViewModel.Settings);
             ViewModel.SetBanner(
                 BannerKind.Info,
-                ViewModel.SolverFound
-                    ? "Solver path updated."
-                    : "The selected solver path does not exist.");
+                ViewModel.SolverFound ? Loc["solver.ready"] : Loc["solver.notFound"]);
         }
     }
 

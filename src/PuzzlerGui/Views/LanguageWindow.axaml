@@ -1,0 +1,31 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="using:PuzzlerGui.Views"
+        xmlns:services="using:PuzzlerGui.Services"
+        x:Class="PuzzlerGui.Views.LanguageWindow"
+        x:DataType="views:LanguageWindow"
+        Title="{Binding Loc[language.title]}"
+        Width="480"
+        Height="220"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="{DynamicResource AppBackground}">
+
+  <StackPanel Margin="24" Spacing="14">
+    <TextBlock Classes="title" Text="{Binding Loc[language.choose]}" />
+
+    <ComboBox x:Name="LanguageBox" MinHeight="34">
+      <ComboBox.ItemTemplate>
+        <DataTemplate x:DataType="services:LanguageOption">
+          <TextBlock Text="{Binding DisplayName}" />
+        </DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,10,0,0">
+      <Button Content="{Binding Loc[dialog.cancel]}" Click="OnCancelClick" MinWidth="88" HorizontalContentAlignment="Center" />
+      <Button Content="{Binding Loc[dialog.ok]}" Click="OnOkClick" MinWidth="88" HorizontalContentAlignment="Center" />
+    </StackPanel>
+  </StackPanel>
+</Window>

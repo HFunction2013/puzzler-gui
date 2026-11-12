@@ -21,6 +21,7 @@ public sealed partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var settings = SettingsStore.Load();
+            LocalizationService.Instance.Apply(settings.Language);
             ApplyTheme(settings.Theme);
 
             var viewModel = new MainWindowViewModel(settings);
@@ -31,6 +32,17 @@ public sealed partial class App : Application
             var initialFile = GetInitialFile(desktop.Args);
             window.Opened += async (_, _) =>
             {
+                if (string.IsNullOrEmpty(settings.Language))
+                {
+                    var languageDialog = new LanguageWindow();
+                    var accepted = await languageDialog.ShowDialog<bool?>(window);
+                    if (accepted == true)
+                    {
+                        settings.Language = LocalizationService.Instance.CurrentLanguage;
+                        SettingsStore.Save(settings);
+                    }
+                }
+
                 if (initialFile is null && MainWindowViewModel.RecoveryFileExists)
                 {
                     await window.AskRestoreRecoveryAsync();

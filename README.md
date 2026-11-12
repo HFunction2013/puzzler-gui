@@ -33,6 +33,10 @@ solver, and flip through every distinct tiling without touching a terminal.
   line, recent files, Ctrl+N/O/S and Ctrl+Shift+S shortcuts, F5 to solve, Esc to
   cancel, an unsaved-changes prompt, light/dark/system themes, and a settings
   dialog for locating the solver.
+- **Localization** — the interface follows the system locale and supports
+  English, Simplified Chinese, Traditional Chinese and Japanese; unmatched
+  locales fall back to English. The first launch offers a language choice, and
+  the preference can be changed in Settings.
 
 ## Requirements
 

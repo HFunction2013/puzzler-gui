@@ -13,7 +13,10 @@ public sealed class MessageDialog : Window
         string message,
         string primaryButton,
         string? secondaryButton = null,
-        string? tertiaryButton = null)
+        string? tertiaryButton = null,
+        string primaryResult = "OK",
+        string? secondaryResult = null,
+        string? tertiaryResult = null)
     {
         Title = title;
         Width = 500;
@@ -42,15 +45,15 @@ public sealed class MessageDialog : Window
 
         if (tertiaryButton is not null)
         {
-            buttons.Children.Add(CreateButton(tertiaryButton));
+            buttons.Children.Add(CreateButton(tertiaryButton, tertiaryResult ?? tertiaryButton));
         }
 
         if (secondaryButton is not null)
         {
-            buttons.Children.Add(CreateButton(secondaryButton));
+            buttons.Children.Add(CreateButton(secondaryButton, secondaryResult ?? secondaryButton));
         }
 
-        buttons.Children.Add(CreateButton(primaryButton));
+        buttons.Children.Add(CreateButton(primaryButton, primaryResult));
 
         content.Children.Add(buttons);
         Content = content;
@@ -58,7 +61,7 @@ public sealed class MessageDialog : Window
 
     public Task<string> ShowAsync(Window owner) => ShowDialog<string>(owner);
 
-    private Button CreateButton(string label)
+    private Button CreateButton(string label, string result)
     {
         var button = new Button
         {
@@ -66,7 +69,7 @@ public sealed class MessageDialog : Window
             MinWidth = 88,
             HorizontalContentAlignment = HorizontalAlignment.Center,
         };
-        button.Click += (_, _) => Close(label);
+        button.Click += (_, _) => Close(result);
         return button;
     }
 }

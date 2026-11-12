@@ -216,6 +216,7 @@ public sealed class ShapeAndBoardTests
     [Fact]
     public void Document_Validation_FlagsAreaMismatchAndDuplicateIds()
     {
+        LocalizationService.Instance.SetLanguage("en");
         var document = new PuzzleDocument("bad", BoardModel.Rectangle(4, 4));
         document.Pieces.Add(new PieceModel("a", ShapeModel.FromText("##"), 1));
         document.Pieces.Add(new PieceModel("a", ShapeModel.FromText("##"), 1));

@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using PuzzlerGui.Services;
 
@@ -23,7 +24,7 @@ public sealed partial class PuzzleDocument : ObservableObject
         _name = name;
         Board = board;
         Pieces = new ObservableCollection<PieceModel>();
-        Board.Changed += OnChildChanged;
+        Board.Changed += OnBoardChanged;
         Pieces.CollectionChanged += OnPiecesChanged;
     }
 
@@ -152,7 +153,25 @@ public sealed partial class PuzzleDocument : ObservableObject
     private static string L(string key, params object?[] args) =>
         string.Format(LocalizationService.Instance[key], args);
 
-    private void OnChildChanged(object? sender, EventArgs e) => RaiseChanged();
+    private static readonly HashSet<string> NonStructuralPieceProperties = new()
+    {
+        nameof(PieceModel.ColorIndex),
+        nameof(PieceModel.Surface),
+        nameof(PieceModel.Brush),
+        nameof(PieceModel.CellSummary),
+    };
+
+    private void OnBoardChanged(object? sender, EventArgs e) => RaiseChanged();
+
+    private void OnPiecePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is not null && NonStructuralPieceProperties.Contains(e.PropertyName))
+        {
+            return;
+        }
+
+        RaiseChanged();
+    }
 
     private void OnPiecesChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
@@ -177,9 +196,9 @@ public sealed partial class PuzzleDocument : ObservableObject
         RaiseChanged();
     }
 
-    private void Attach(PieceModel piece) => piece.PropertyChanged += OnChildChanged;
+    private void Attach(PieceModel piece) => piece.PropertyChanged += OnPiecePropertyChanged;
 
-    private void Detach(PieceModel piece) => piece.PropertyChanged -= OnChildChanged;
+    private void Detach(PieceModel piece) => piece.PropertyChanged -= OnPiecePropertyChanged;
 
     private void RaiseChanged()
     {

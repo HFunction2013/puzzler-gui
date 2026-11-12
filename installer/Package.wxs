@@ -43,13 +43,13 @@
                        Type="integer"
                        Value="1"
                        KeyPath="yes" />
-        <RegistryKey Root="HKCR" Key=".pzle" Action="create">
+        <RegistryKey Root="HKCR" Key=".pzle">
           <RegistryValue Value="PuzzlerGui.PuzzleFile" Type="string" />
         </RegistryKey>
-        <RegistryKey Root="HKCR" Key="PuzzlerGui.PuzzleFile" Action="create">
+        <RegistryKey Root="HKCR" Key="PuzzlerGui.PuzzleFile">
           <RegistryValue Name="FriendlyTypeName" Value="puzzler puzzle file" Type="string" />
           <RegistryValue Name="DefaultIcon" Value="[INSTALLFOLDER]puzzler-gui.ico,0" Type="string" />
-          <RegistryKey Key="shell\open\command" Action="create">
+          <RegistryKey Key="shell\open\command">
             <RegistryValue Value="&quot;[INSTALLFOLDER]PuzzlerGui.exe&quot; &quot;%1&quot;" Type="string" />
           </RegistryKey>
         </RegistryKey>

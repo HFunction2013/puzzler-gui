@@ -4,7 +4,7 @@
         xmlns:services="using:PuzzlerGui.Services"
         x:Class="PuzzlerGui.Views.SettingsWindow"
         x:DataType="views:SettingsWindow"
-        Title="{Binding Loc[dialog.settingsTitle]}"
+        Title="{Binding Strings[dialog.settingsTitle]}"
         Width="640"
         Height="360"
         CanResize="False"
@@ -13,19 +13,19 @@
         Background="{DynamicResource AppBackground}">
 
   <StackPanel Margin="24" Spacing="14">
-    <TextBlock Classes="title" Text="{Binding Loc[dialog.solverSection]}" />
+    <TextBlock Classes="title" Text="{Binding Strings[dialog.solverSection]}" />
     <TextBlock Classes="hint"
-               Text="{Binding Loc[dialog.solverHint]}" />
+               Text="{Binding Strings[dialog.solverHint]}" />
 
     <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
-      <TextBox x:Name="PathBox" Watermark="{Binding Loc[dialog.solverPathWatermark]}" />
-      <Button Grid.Column="1" Content="{Binding Loc[dialog.browse]}" Click="OnBrowseClick" />
-      <Button Grid.Column="2" Content="{Binding Loc[dialog.autoDetect]}" Click="OnDetectClick" />
+      <TextBox x:Name="PathBox" Watermark="{Binding Strings[dialog.solverPathWatermark]}" />
+      <Button Grid.Column="1" Content="{Binding Strings[dialog.browse]}" Click="OnBrowseClick" />
+      <Button Grid.Column="2" Content="{Binding Strings[dialog.autoDetect]}" Click="OnDetectClick" />
     </Grid>
 
     <TextBlock x:Name="StatusText" Classes="hint" Text="" />
 
-    <TextBlock Classes="title" Margin="0,10,0,0" Text="{Binding Loc[language.title]}" />
+    <TextBlock Classes="title" Margin="0,10,0,0" Text="{Binding Strings[language.title]}" />
     <ComboBox x:Name="LanguageBox" MinHeight="34">
       <ComboBox.ItemTemplate>
         <DataTemplate x:DataType="services:LanguageOption">
@@ -35,8 +35,8 @@
     </ComboBox>
 
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,10,0,0">
-      <Button Content="{Binding Loc[dialog.cancel]}" Click="OnCancelClick" MinWidth="88" HorizontalContentAlignment="Center" />
-      <Button Content="{Binding Loc[dialog.ok]}" Click="OnOkClick" MinWidth="88" HorizontalContentAlignment="Center" />
+      <Button Content="{Binding Strings[dialog.cancel]}" Click="OnCancelClick" MinWidth="88" HorizontalContentAlignment="Center" />
+      <Button Content="{Binding Strings[dialog.ok]}" Click="OnOkClick" MinWidth="88" HorizontalContentAlignment="Center" />
     </StackPanel>
   </StackPanel>
 </Window>

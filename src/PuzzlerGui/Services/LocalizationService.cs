@@ -120,6 +120,9 @@ public sealed partial class LocalizationService : ObservableObject
         ["pieces.clear"] = "Clear",
         ["pieces.duplicate"] = "Duplicate",
         ["pieces.selectHint"] = "Select a piece to edit its shape and options.",
+        ["tri.inherit"] = "Inherit",
+        ["tri.allow"] = "Allow",
+        ["tri.forbid"] = "Forbid",
 
         ["solver.section"] = "SOLVER",
         ["solver.maxSolutions"] = "Max solutions",
@@ -295,6 +298,9 @@ public sealed partial class LocalizationService : ObservableObject
         ["pieces.clear"] = "清除",
         ["pieces.duplicate"] = "复制",
         ["pieces.selectHint"] = "选择拼块以编辑其形状和选项。",
+        ["tri.inherit"] = "继承",
+        ["tri.allow"] = "允许",
+        ["tri.forbid"] = "禁止",
 
         ["solver.section"] = "求解器",
         ["solver.maxSolutions"] = "最大解数",
@@ -470,6 +476,9 @@ public sealed partial class LocalizationService : ObservableObject
         ["pieces.clear"] = "清除",
         ["pieces.duplicate"] = "複製",
         ["pieces.selectHint"] = "選擇拼塊以編輯其形狀和選項。",
+        ["tri.inherit"] = "繼承",
+        ["tri.allow"] = "允許",
+        ["tri.forbid"] = "禁止",
 
         ["solver.section"] = "求解器",
         ["solver.maxSolutions"] = "最大解數",
@@ -645,6 +654,9 @@ public sealed partial class LocalizationService : ObservableObject
         ["pieces.clear"] = "クリア",
         ["pieces.duplicate"] = "複製",
         ["pieces.selectHint"] = "ピースを選択して形状とオプションを編集します。",
+        ["tri.inherit"] = "継承",
+        ["tri.allow"] = "許可",
+        ["tri.forbid"] = "禁止",
 
         ["solver.section"] = "ソルバー",
         ["solver.maxSolutions"] = "最大解数",

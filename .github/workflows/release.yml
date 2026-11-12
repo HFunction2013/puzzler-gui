@@ -9,7 +9,7 @@ on:
       version:
         description: Version to stamp into the build (without a leading v)
         required: false
-        default: '0.1.7'
+        default: '0.1.8'
 
 permissions:
   contents: write
@@ -59,7 +59,7 @@ jobs:
             VERSION="${GITHUB_REF_NAME#v}"
           else
             VERSION="${{ github.event.inputs.version }}"
-            if [ -z "$VERSION" ]; then VERSION="0.1.7"; fi
+            if [ -z "$VERSION" ]; then VERSION="0.1.8"; fi
           fi
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "Building puzzler-gui $VERSION for $RID"
@@ -200,7 +200,8 @@ jobs:
             platform and start `PuzzlerGui` (`PuzzlerGui.exe` on Windows).
             Windows x64 also has an English MSI installer that supports a custom
             install folder, optional shortcuts, opening `.pzle` files from
-            Explorer, and launching puzzler-gui after setup by default.
+            Explorer, launching puzzler-gui after setup by default, and removing
+            per-user settings and recovery data when uninstalled.
             The macOS archive is a `.app` bundle that declares `.pzle`; the Linux
             archive includes `linux/install-linux.sh` for desktop/MIME
             registration.

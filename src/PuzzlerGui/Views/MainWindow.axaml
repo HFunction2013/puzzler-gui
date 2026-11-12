@@ -15,13 +15,13 @@
   <DockPanel>
 
     <Menu DockPanel.Dock="Top" Background="{DynamicResource CardBackground}">
-      <MenuItem Header="{Binding Loc[menu.file]}">
-        <MenuItem Header="{Binding Loc[menu.new]}" InputGesture="Ctrl+N" Click="OnNewClick" />
-        <MenuItem Header="{Binding Loc[menu.open]}" InputGesture="Ctrl+O" Click="OnOpenClick" />
-        <MenuItem Header="{Binding Loc[menu.save]}" InputGesture="Ctrl+S" Click="OnSaveClick" />
-        <MenuItem Header="{Binding Loc[menu.saveAs]}" InputGesture="Ctrl+Shift+S" Click="OnSaveAsClick" />
+      <MenuItem Header="{Binding Strings[menu.file]}">
+        <MenuItem Header="{Binding Strings[menu.new]}" InputGesture="Ctrl+N" Click="OnNewClick" />
+        <MenuItem Header="{Binding Strings[menu.open]}" InputGesture="Ctrl+O" Click="OnOpenClick" />
+        <MenuItem Header="{Binding Strings[menu.save]}" InputGesture="Ctrl+S" Click="OnSaveClick" />
+        <MenuItem Header="{Binding Strings[menu.saveAs]}" InputGesture="Ctrl+Shift+S" Click="OnSaveAsClick" />
         <Separator />
-        <MenuItem Header="{Binding Loc[menu.openSample]}">
+        <MenuItem Header="{Binding Strings[menu.openSample]}">
           <MenuItem Header="Dominoes 2×3" Tag="dominoes_2x3.pzle" Click="OnSampleClick" />
           <MenuItem Header="Four dominoes" Tag="four_dominoes.pzle" Click="OnSampleClick" />
           <MenuItem Header="No-rotate row" Tag="no_rotate_row.pzle" Click="OnSampleClick" />
@@ -34,33 +34,33 @@
           <MenuItem Header="Pentominoes 6×10 (2,339 solutions)" Tag="pentomino_6x10.pzle" Click="OnSampleClick" />
         </MenuItem>
         <Separator />
-        <MenuItem Header="{Binding Loc[menu.exit]}" Click="OnExitClick" />
+        <MenuItem Header="{Binding Strings[menu.exit]}" Click="OnExitClick" />
       </MenuItem>
 
-      <MenuItem Header="{Binding Loc[menu.edit]}">
-        <MenuItem Header="{Binding Loc[menu.undo]}" InputGesture="Ctrl+Z" Command="{Binding UndoCommand}" />
-        <MenuItem Header="{Binding Loc[menu.redo]}" InputGesture="Ctrl+Y" Command="{Binding RedoCommand}" />
+      <MenuItem Header="{Binding Strings[menu.edit]}">
+        <MenuItem Header="{Binding Strings[menu.undo]}" InputGesture="Ctrl+Z" Command="{Binding UndoCommand}" />
+        <MenuItem Header="{Binding Strings[menu.redo]}" InputGesture="Ctrl+Y" Command="{Binding RedoCommand}" />
       </MenuItem>
 
-      <MenuItem Header="{Binding Loc[menu.solve]}">
-        <MenuItem Header="{Binding Loc[menu.solvePuzzle]}" InputGesture="F5" Click="OnSolveClick" />
-        <MenuItem Header="{Binding Loc[menu.cancelSearch]}" Click="OnCancelClick" />
+      <MenuItem Header="{Binding Strings[menu.solve]}">
+        <MenuItem Header="{Binding Strings[menu.solvePuzzle]}" InputGesture="F5" Click="OnSolveClick" />
+        <MenuItem Header="{Binding Strings[menu.cancelSearch]}" Click="OnCancelClick" />
         <Separator />
-        <MenuItem Header="{Binding Loc[menu.validate]}" Click="OnValidateClick" />
+        <MenuItem Header="{Binding Strings[menu.validate]}" Click="OnValidateClick" />
       </MenuItem>
 
-      <MenuItem Header="{Binding Loc[menu.settings]}">
-        <MenuItem Header="{Binding Loc[menu.settingsSub]}" Click="OnSettingsClick" />
+      <MenuItem Header="{Binding Strings[menu.settings]}">
+        <MenuItem Header="{Binding Strings[menu.settingsSub]}" Click="OnSettingsClick" />
       </MenuItem>
 
-      <MenuItem Header="{Binding Loc[menu.view]}">
-        <MenuItem Header="{Binding Loc[menu.lightTheme]}" Tag="Light" Click="OnThemeClick" />
-        <MenuItem Header="{Binding Loc[menu.darkTheme]}" Tag="Dark" Click="OnThemeClick" />
-        <MenuItem Header="{Binding Loc[menu.systemTheme]}" Tag="System" Click="OnThemeClick" />
+      <MenuItem Header="{Binding Strings[menu.view]}">
+        <MenuItem Header="{Binding Strings[menu.lightTheme]}" Tag="Light" Click="OnThemeClick" />
+        <MenuItem Header="{Binding Strings[menu.darkTheme]}" Tag="Dark" Click="OnThemeClick" />
+        <MenuItem Header="{Binding Strings[menu.systemTheme]}" Tag="System" Click="OnThemeClick" />
       </MenuItem>
 
-      <MenuItem Header="{Binding Loc[menu.help]}">
-        <MenuItem Header="{Binding Loc[menu.about]}" Click="OnAboutClick" />
+      <MenuItem Header="{Binding Strings[menu.help]}">
+        <MenuItem Header="{Binding Strings[menu.about]}" Click="OnAboutClick" />
       </MenuItem>
     </Menu>
 
@@ -89,7 +89,7 @@
                      VerticalAlignment="Center"
                      MaxWidth="520"
                      TextTrimming="CharacterEllipsis" />
-          <Button Content="{Binding Loc[dialog.settingsTitle]}" Classes="link" Click="OnSettingsClick" />
+          <Button Content="{Binding Strings[dialog.settingsTitle]}" Classes="link" Click="OnSettingsClick" />
         </StackPanel>
       </Grid>
     </Border>
@@ -102,39 +102,39 @@
           <!-- Puzzle properties -->
           <Border Classes="card">
             <StackPanel Spacing="8">
-              <TextBlock Classes="section" Text="{Binding Loc[puzzle.section]}" />
-              <TextBox Text="{Binding Document.Name, Mode=TwoWay}" Watermark="{Binding Loc[puzzle.nameWatermark]}" />
+              <TextBlock Classes="section" Text="{Binding Strings[puzzle.section]}" />
+              <TextBox Text="{Binding Document.Name, Mode=TwoWay}" Watermark="{Binding Strings[puzzle.nameWatermark]}" />
               <CheckBox IsChecked="{Binding Document.AllUse, Mode=TwoWay}"
-                        Content="{Binding Loc[puzzle.allUse]}" />
+                        Content="{Binding Strings[puzzle.allUse]}" />
               <CheckBox IsChecked="{Binding Document.CanRotate, Mode=TwoWay}"
-                        Content="{Binding Loc[puzzle.canRotate]}" />
+                        Content="{Binding Strings[puzzle.canRotate]}" />
               <CheckBox IsChecked="{Binding Document.CanFlip, Mode=TwoWay}"
-                        Content="{Binding Loc[puzzle.canFlip]}" />
+                        Content="{Binding Strings[puzzle.canFlip]}" />
             </StackPanel>
           </Border>
 
           <!-- Board -->
           <Border Classes="card">
             <StackPanel Spacing="8">
-              <TextBlock Classes="section" Text="{Binding Loc[board.section]}" />
+              <TextBlock Classes="section" Text="{Binding Strings[board.section]}" />
               <Grid ColumnDefinitions="*,8,*">
                 <StackPanel Spacing="2">
-                  <TextBlock Classes="hint" Text="{Binding Loc[board.width]}" />
+                  <TextBlock Classes="hint" Text="{Binding Strings[board.width]}" />
                   <NumericUpDown Value="{Binding BoardWidthValue, Mode=TwoWay}"
                                  Minimum="1" Maximum="128" Increment="1" FormatString="0" />
                 </StackPanel>
                 <StackPanel Grid.Column="2" Spacing="2">
-                  <TextBlock Classes="hint" Text="{Binding Loc[board.height]}" />
+                  <TextBlock Classes="hint" Text="{Binding Strings[board.height]}" />
                   <NumericUpDown Value="{Binding BoardHeightValue, Mode=TwoWay}"
                                  Minimum="1" Maximum="128" Increment="1" FormatString="0" />
                 </StackPanel>
               </Grid>
               <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button Content="{Binding Loc[board.fillAll]}" Command="{Binding FillBoardCommand}" />
-                <Button Content="{Binding Loc[board.clearAll]}" Command="{Binding ClearBoardCommand}" />
+                <Button Content="{Binding Strings[board.fillAll]}" Command="{Binding FillBoardCommand}" />
+                <Button Content="{Binding Strings[board.clearAll]}" Command="{Binding ClearBoardCommand}" />
               </StackPanel>
               <TextBlock Classes="hint"
-                         Text="{Binding Loc[board.paintHint]}" />
+                         Text="{Binding Strings[board.paintHint]}" />
             </StackPanel>
           </Border>
 
@@ -142,10 +142,10 @@
           <Border Classes="card">
             <StackPanel Spacing="8">
               <DockPanel>
-                <TextBlock Classes="section" Text="{Binding Loc[pieces.section]}" VerticalAlignment="Center" />
+                <TextBlock Classes="section" Text="{Binding Strings[pieces.section]}" VerticalAlignment="Center" />
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6">
-                  <Button Content="{Binding Loc[pieces.add]}" Command="{Binding AddPieceCommand}" />
-                  <Button Content="{Binding Loc[pieces.remove]}" Command="{Binding RemovePieceCommand}" />
+                  <Button Content="{Binding Strings[pieces.add]}" Command="{Binding AddPieceCommand}" />
+                  <Button Content="{Binding Strings[pieces.remove]}" Command="{Binding RemovePieceCommand}" />
                 </StackPanel>
               </DockPanel>
 
@@ -178,17 +178,17 @@
 
               <TextBlock Classes="hint"
                          IsVisible="{Binding !HasSelectedPiece}"
-                         Text="{Binding Loc[pieces.selectHint]}" />
+                         Text="{Binding Strings[pieces.selectHint]}" />
 
               <StackPanel Spacing="8" IsVisible="{Binding HasSelectedPiece}">
                 <Separator />
                 <Grid ColumnDefinitions="2*,8,*">
                   <StackPanel Spacing="2">
-                    <TextBlock Classes="hint" Text="{Binding Loc[pieces.id]}" />
+                    <TextBlock Classes="hint" Text="{Binding Strings[pieces.id]}" />
                     <TextBox Text="{Binding SelectedPieceId, Mode=TwoWay}" />
                   </StackPanel>
                   <StackPanel Grid.Column="2" Spacing="2">
-                    <TextBlock Classes="hint" Text="{Binding Loc[pieces.count]}" />
+                    <TextBlock Classes="hint" Text="{Binding Strings[pieces.count]}" />
                     <NumericUpDown Value="{Binding PieceCountValue, Mode=TwoWay}"
                                    Minimum="1" Maximum="65535" Increment="1" FormatString="0" />
                   </StackPanel>
@@ -196,27 +196,41 @@
 
                 <Grid ColumnDefinitions="*,8,*">
                   <StackPanel Spacing="2">
-                    <TextBlock Classes="hint" Text="{Binding Loc[pieces.rotationOverride]}" />
+                    <TextBlock Classes="hint" Text="{Binding Strings[pieces.rotationOverride]}" />
                     <ComboBox ItemsSource="{Binding TriStateOptions}"
-                              SelectedItem="{Binding SelectedPiece.CanRotate, Mode=TwoWay}"
-                              HorizontalAlignment="Stretch" />
+                              SelectedValue="{Binding SelectedPiece.CanRotate, Mode=TwoWay}"
+                              SelectedValueBinding="{Binding Value}"
+                              HorizontalAlignment="Stretch">
+                      <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="models:TriStateOption">
+                          <TextBlock Text="{Binding Display}" />
+                        </DataTemplate>
+                      </ComboBox.ItemTemplate>
+                    </ComboBox>
                   </StackPanel>
                   <StackPanel Grid.Column="2" Spacing="2">
-                    <TextBlock Classes="hint" Text="{Binding Loc[pieces.flipOverride]}" />
+                    <TextBlock Classes="hint" Text="{Binding Strings[pieces.flipOverride]}" />
                     <ComboBox ItemsSource="{Binding TriStateOptions}"
-                              SelectedItem="{Binding SelectedPiece.CanFlip, Mode=TwoWay}"
-                              HorizontalAlignment="Stretch" />
+                              SelectedValue="{Binding SelectedPiece.CanFlip, Mode=TwoWay}"
+                              SelectedValueBinding="{Binding Value}"
+                              HorizontalAlignment="Stretch">
+                      <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="models:TriStateOption">
+                          <TextBlock Text="{Binding Display}" />
+                        </DataTemplate>
+                      </ComboBox.ItemTemplate>
+                    </ComboBox>
                   </StackPanel>
                 </Grid>
 
                 <Grid ColumnDefinitions="*,8,*">
                   <StackPanel Spacing="2">
-                    <TextBlock Classes="hint" Text="{Binding Loc[pieces.shapeWidth]}" />
+                    <TextBlock Classes="hint" Text="{Binding Strings[pieces.shapeWidth]}" />
                     <NumericUpDown Value="{Binding ShapeWidthValue, Mode=TwoWay}"
                                    Minimum="1" Maximum="64" Increment="1" FormatString="0" />
                   </StackPanel>
                   <StackPanel Grid.Column="2" Spacing="2">
-                    <TextBlock Classes="hint" Text="{Binding Loc[pieces.shapeHeight]}" />
+                    <TextBlock Classes="hint" Text="{Binding Strings[pieces.shapeHeight]}" />
                     <NumericUpDown Value="{Binding ShapeHeightValue, Mode=TwoWay}"
                                    Minimum="1" Maximum="64" Increment="1" FormatString="0" />
                   </StackPanel>
@@ -231,12 +245,12 @@
                 </Border>
 
                 <WrapPanel Orientation="Horizontal">
-                  <Button Content="{Binding Loc[pieces.rotateLeft]}" Margin="0,0,6,6" Command="{Binding RotatePieceLeftCommand}" />
-                  <Button Content="{Binding Loc[pieces.rotateRight]}" Margin="0,0,6,6" Command="{Binding RotatePieceRightCommand}" />
-                  <Button Content="{Binding Loc[pieces.mirror]}" Margin="0,0,6,6" Command="{Binding MirrorPieceCommand}" />
-                  <Button Content="{Binding Loc[pieces.trim]}" Margin="0,0,6,6" Command="{Binding TrimPieceCommand}" />
-                  <Button Content="{Binding Loc[pieces.clear]}" Margin="0,0,6,6" Command="{Binding ClearPieceCommand}" />
-                  <Button Content="{Binding Loc[pieces.duplicate]}" Margin="0,0,6,6" Command="{Binding DuplicatePieceCommand}" />
+                  <Button Content="{Binding Strings[pieces.rotateLeft]}" Margin="0,0,6,6" Command="{Binding RotatePieceLeftCommand}" />
+                  <Button Content="{Binding Strings[pieces.rotateRight]}" Margin="0,0,6,6" Command="{Binding RotatePieceRightCommand}" />
+                  <Button Content="{Binding Strings[pieces.mirror]}" Margin="0,0,6,6" Command="{Binding MirrorPieceCommand}" />
+                  <Button Content="{Binding Strings[pieces.trim]}" Margin="0,0,6,6" Command="{Binding TrimPieceCommand}" />
+                  <Button Content="{Binding Strings[pieces.clear]}" Margin="0,0,6,6" Command="{Binding ClearPieceCommand}" />
+                  <Button Content="{Binding Strings[pieces.duplicate]}" Margin="0,0,6,6" Command="{Binding DuplicatePieceCommand}" />
                 </WrapPanel>
               </StackPanel>
             </StackPanel>
@@ -245,47 +259,47 @@
           <!-- Solver -->
           <Border Classes="card">
             <StackPanel Spacing="8">
-              <TextBlock Classes="section" Text="{Binding Loc[solver.section]}" />
+              <TextBlock Classes="section" Text="{Binding Strings[solver.section]}" />
 
               <Grid ColumnDefinitions="*,8,*">
                 <StackPanel Spacing="2">
-                  <TextBlock Classes="hint" Text="{Binding Loc[solver.maxSolutions]}" />
+                  <TextBlock Classes="hint" Text="{Binding Strings[solver.maxSolutions]}" />
                   <NumericUpDown Value="{Binding LimitSolutions, Mode=TwoWay}"
                                  Minimum="1" Maximum="1000000" Increment="1"
-                                 FormatString="0" Watermark="{Binding Loc[watermark.all]}" />
+                                 FormatString="0" Watermark="{Binding Strings[watermark.all]}" />
                 </StackPanel>
                 <StackPanel Grid.Column="2" Spacing="2">
-                  <TextBlock Classes="hint" Text="{Binding Loc[solver.nodeLimit]}" />
+                  <TextBlock Classes="hint" Text="{Binding Strings[solver.nodeLimit]}" />
                   <NumericUpDown Value="{Binding NodeLimit, Mode=TwoWay}"
                                  Minimum="1" Maximum="1000000000000" Increment="1000"
-                                 FormatString="0" Watermark="{Binding Loc[watermark.none]}" />
+                                 FormatString="0" Watermark="{Binding Strings[watermark.none]}" />
                 </StackPanel>
               </Grid>
 
               <Grid ColumnDefinitions="*,8,*">
                 <StackPanel Spacing="2">
-                  <TextBlock Classes="hint" Text="{Binding Loc[solver.timeLimit]}" />
+                  <TextBlock Classes="hint" Text="{Binding Strings[solver.timeLimit]}" />
                   <NumericUpDown Value="{Binding TimeLimit, Mode=TwoWay}"
                                  Minimum="0" Maximum="86400" Increment="0.5"
-                                 FormatString="0.###" Watermark="{Binding Loc[watermark.none]}" />
+                                 FormatString="0.###" Watermark="{Binding Strings[watermark.none]}" />
                 </StackPanel>
                 <StackPanel Grid.Column="2" Spacing="2">
-                  <TextBlock Classes="hint" Text="{Binding Loc[solver.seed]}" />
+                  <TextBlock Classes="hint" Text="{Binding Strings[solver.seed]}" />
                   <NumericUpDown Value="{Binding SeedValue, Mode=TwoWay}"
                                  Minimum="0" Maximum="1000000000000" Increment="1"
-                                 FormatString="0" Watermark="{Binding Loc[watermark.clock]}" />
+                                 FormatString="0" Watermark="{Binding Strings[watermark.clock]}" />
                 </StackPanel>
               </Grid>
 
               <CheckBox IsChecked="{Binding Dedupe, Mode=TwoWay}"
-                        Content="{Binding Loc[solver.dedupe]}" />
+                        Content="{Binding Strings[solver.dedupe]}" />
               <CheckBox IsChecked="{Binding CompressJson, Mode=TwoWay}"
-                        Content="{Binding Loc[solver.compressJson]}" />
+                        Content="{Binding Strings[solver.compressJson]}" />
 
               <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button Classes="primary" Content="{Binding Loc[solver.solve]}" Command="{Binding SolveCommand}"
+                <Button Classes="primary" Content="{Binding Strings[solver.solve]}" Command="{Binding SolveCommand}"
                         MinWidth="120" />
-                <Button Content="{Binding Loc[solver.cancel]}" Command="{Binding CancelSolveCommand}"
+                <Button Content="{Binding Strings[solver.cancel]}" Command="{Binding CancelSolveCommand}"
                         IsVisible="{Binding IsSolving}" />
               </StackPanel>
 
@@ -303,7 +317,7 @@
 
       <TabControl Grid.Column="2" SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}">
 
-        <TabItem Header="{Binding Loc[tab.board]}">
+        <TabItem Header="{Binding Strings[tab.board]}">
           <Grid RowDefinitions="*,Auto" Margin="0,8,0,0">
             <Border Grid.Row="0" Classes="canvasHost">
               <controls:GridCanvas x:Name="BoardCanvas"
@@ -323,18 +337,18 @@
             <Border DockPanel.Dock="Top" Padding="0,0,0,8">
               <Grid ColumnDefinitions="Auto,*,Auto">
                 <StackPanel Orientation="Horizontal" Spacing="6">
-                  <Button Classes="nav" Content="⏮" ToolTip.Tip="{Binding Loc[solution.first]}"
+                  <Button Classes="nav" Content="⏮" ToolTip.Tip="{Binding Strings[solution.first]}"
                           Command="{Binding FirstSolutionCommand}" />
-                  <Button Classes="nav" Content="◀" ToolTip.Tip="{Binding Loc[solution.previous]}"
+                  <Button Classes="nav" Content="◀" ToolTip.Tip="{Binding Strings[solution.previous]}"
                           Command="{Binding PreviousSolutionCommand}" />
                   <TextBlock Text="{Binding SolutionIndexLabel}"
                              VerticalAlignment="Center"
                              MinWidth="68"
                              TextAlignment="Center"
                              FontWeight="SemiBold" />
-                  <Button Classes="nav" Content="▶" ToolTip.Tip="{Binding Loc[solution.next]}"
+                  <Button Classes="nav" Content="▶" ToolTip.Tip="{Binding Strings[solution.next]}"
                           Command="{Binding NextSolutionCommand}" />
-                  <Button Classes="nav" Content="⏭" ToolTip.Tip="{Binding Loc[solution.last]}"
+                  <Button Classes="nav" Content="⏭" ToolTip.Tip="{Binding Strings[solution.last]}"
                           Command="{Binding LastSolutionCommand}" />
                 </StackPanel>
                 <TextBlock Grid.Column="1"
@@ -343,7 +357,7 @@
                            VerticalAlignment="Center"
                            Margin="16,0"
                            TextTrimming="CharacterEllipsis" />
-                <Button Grid.Column="2" Content="{Binding Loc[solution.exportJson]}" Click="OnExportClick" />
+                <Button Grid.Column="2" Content="{Binding Strings[solution.exportJson]}" Click="OnExportClick" />
               </Grid>
             </Border>
 
@@ -353,7 +367,7 @@
                     Padding="10,6"
                     CornerRadius="6"
                     Margin="0,0,0,8">
-              <TextBlock Text="{Binding Loc[solution.staleWarning]}"
+              <TextBlock Text="{Binding Strings[solution.staleWarning]}"
                          Foreground="#6B4A00"
                          FontSize="11"
                          TextWrapping="Wrap" />
@@ -362,7 +376,7 @@
             <Border DockPanel.Dock="Right" Width="300" Classes="card" Margin="12,0,0,0">
               <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel Spacing="6">
-                  <TextBlock Classes="section" Text="{Binding Loc[solution.placements]}" />
+                  <TextBlock Classes="section" Text="{Binding Strings[solution.placements]}" />
                   <TextBlock Text="{Binding MultiplicityText}" Classes="hint" Margin="0,0,0,4" />
                   <ItemsControl ItemsSource="{Binding Placements}">
                     <ItemsControl.ItemTemplate>

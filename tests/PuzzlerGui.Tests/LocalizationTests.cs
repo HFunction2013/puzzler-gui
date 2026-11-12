@@ -1,4 +1,5 @@
 using PuzzlerGui.Services;
+using PuzzlerGui.ViewModels;
 
 namespace PuzzlerGui.Tests;
 
@@ -36,6 +37,26 @@ public sealed class LocalizationTests
         var service = LocalizationService.Instance;
         service.Apply("xx-XX");
         Assert.Contains(service.CurrentLanguage, new[] { "en", "zh-CN", "zh-TW", "ja" });
+    }
+
+    [Fact]
+    public void SetLanguage_RefreshesViewModelLocalizedBindings()
+    {
+        var service = LocalizationService.Instance;
+        var viewModel = new MainWindowViewModel(new AppSettings { Language = "en" });
+        var notified = new HashSet<string?>();
+        viewModel.PropertyChanged += (_, args) => notified.Add(args.PropertyName);
+
+        service.SetLanguage("zh-CN");
+
+        Assert.Equal(service.Strings["puzzle.section"], viewModel.Strings["puzzle.section"]);
+        Assert.Contains(nameof(MainWindowViewModel.Strings), notified);
+        Assert.Contains("Item[]", notified);
+        Assert.Contains(nameof(MainWindowViewModel.BoardSummary), notified);
+        Assert.Contains(nameof(MainWindowViewModel.SolverStatusText), notified);
+        Assert.Equal(service.Strings["tri.inherit"], viewModel.TriStateOptions[0].Display);
+
+        service.SetLanguage("en");
     }
 
     [Fact]

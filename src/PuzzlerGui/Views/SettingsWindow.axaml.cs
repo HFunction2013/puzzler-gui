@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
@@ -5,11 +6,15 @@ using PuzzlerGui.Services;
 
 namespace PuzzlerGui.Views;
 
-public sealed partial class SettingsWindow : Window
+public sealed partial class SettingsWindow : Window, INotifyPropertyChanged
 {
     private readonly string _originalLanguageCode;
 
+    public new event PropertyChangedEventHandler? PropertyChanged;
+
     public LocalizationService Loc { get; }
+
+    public IReadOnlyDictionary<string, string> Strings => Loc.Strings;
 
     public SettingsWindow()
         : this(new AppSettings())
@@ -19,6 +24,8 @@ public sealed partial class SettingsWindow : Window
     public SettingsWindow(AppSettings settings)
     {
         Loc = LocalizationService.Instance;
+        Loc.PropertyChanged += OnLocChanged;
+        Closed += (_, _) => Loc.PropertyChanged -= OnLocChanged;
         _originalLanguageCode = Loc.CurrentLanguage;
         InitializeComponent();
         DataContext = this;
@@ -36,6 +43,18 @@ public sealed partial class SettingsWindow : Window
 
     public string SelectedLanguageCode =>
         (LanguageBox.SelectedItem as LanguageOption)?.Code ?? Loc.CurrentLanguage;
+
+    private void OnLocChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is not nameof(LocalizationService.Strings) and not "Item[]")
+        {
+            return;
+        }
+
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Loc)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Strings)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Item[]"));
+    }
 
     private async void OnBrowseClick(object? sender, RoutedEventArgs e)
     {

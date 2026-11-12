@@ -7,6 +7,8 @@ public enum TriState
     Forbid,
 }
 
+public sealed record TriStateOption(TriState Value, string Display);
+
 public static class TriStateExtensions
 {
     public static bool? ToNullable(this TriState value) => value switch

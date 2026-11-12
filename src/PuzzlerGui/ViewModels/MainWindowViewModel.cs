@@ -39,6 +39,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     private GridData? _solutionSurface;
     private CancellationTokenSource? _solveCancellation;
     private SolveReport? _lastReport;
+    private SolveOutcome? _lastOutcome;
     private string _lastJson = string.Empty;
     private DateTimeOffset _solveStarted;
     private string? _currentFilePath;
@@ -75,7 +76,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
         _document.Changed += OnDocumentChanged;
         Placements = new ObservableCollection<PlacementRow>();
         RecentFiles = new ObservableCollection<string>(settings.RecentFiles);
-        TriStateOptions = new[] { TriState.Inherit, TriState.Allow, TriState.Forbid };
+        TriStateOptions = new ObservableCollection<TriStateOption>();
+        ReloadTriStateOptions();
 
         SelectedPiece = _document.Pieces.FirstOrDefault();
         RefreshDocumentState(markDirty: false);
@@ -91,6 +93,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
             }
 
             OnPropertyChanged(nameof(Loc));
+            OnPropertyChanged(nameof(Strings));
+            OnPropertyChanged("Item[]");
             OnPropertyChanged(nameof(WindowTitle));
             OnPropertyChanged(nameof(CurrentFileName));
             OnPropertyChanged(nameof(BoardSummary));
@@ -98,11 +102,10 @@ public sealed partial class MainWindowViewModel : ObservableObject
             OnPropertyChanged(nameof(SolutionsTabHeader));
             OnPropertyChanged(nameof(SolverStatusText));
             OnPropertyChanged(nameof(SolutionIndexLabel));
-            if (_validationValid)
-            {
-                ValidationText = Loc["solver.validationFallback"];
-            }
-
+            OnPropertyChanged(nameof(StatLine));
+            OnPropertyChanged(nameof(MultiplicityText));
+            ReloadTriStateOptions();
+            RefreshLocalizedStatus();
             UpdateSolutionView();
         };
 
@@ -118,7 +121,9 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     public LocalizationService Loc => LocalizationService.Instance;
 
-    public IReadOnlyList<TriState> TriStateOptions { get; }
+    public IReadOnlyDictionary<string, string> Strings => Loc.Strings;
+
+    public ObservableCollection<TriStateOption> TriStateOptions { get; }
 
     public ObservableCollection<PlacementRow> Placements { get; }
 
@@ -1131,6 +1136,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     private void ApplyReport(SolveOutcome outcome)
     {
         _lastReport = outcome.Report;
+        _lastOutcome = outcome;
         _lastJson = outcome.RawJson;
         SolutionCount = outcome.Report?.Solutions.Count ?? 0;
         SolutionsStale = _revision != _solveRevision;
@@ -1146,6 +1152,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     private void ClearReport()
     {
         _lastReport = null;
+        _lastOutcome = null;
         _lastJson = string.Empty;
         SolutionCount = 0;
         SelectedSolutionIndex = 0;
@@ -1259,6 +1266,29 @@ public sealed partial class MainWindowViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(SolverStatusText));
         OnPropertyChanged(nameof(SolverFound));
+    }
+
+    private void ReloadTriStateOptions()
+    {
+        TriStateOptions.Clear();
+        TriStateOptions.Add(new TriStateOption(TriState.Inherit, Loc["tri.inherit"]));
+        TriStateOptions.Add(new TriStateOption(TriState.Allow, Loc["tri.allow"]));
+        TriStateOptions.Add(new TriStateOption(TriState.Forbid, Loc["tri.forbid"]));
+    }
+
+    private void RefreshLocalizedStatus()
+    {
+        StatusText = _isSolving ? Loc["status.solving"] : Loc["status.ready"];
+        if (_validationValid)
+        {
+            ValidationText = Loc["solver.validationFallback"];
+        }
+
+        UpdateSolverStatus();
+        if (_lastOutcome is not null)
+        {
+            RebuildStatistics(_lastOutcome);
+        }
     }
 
     private void UpdateTitle()

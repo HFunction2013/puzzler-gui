@@ -29,10 +29,18 @@ public sealed partial class App : Application
             desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
 
             var initialFile = GetInitialFile(desktop.Args);
-            if (initialFile is not null)
+            window.Opened += async (_, _) =>
             {
-                window.Opened += (_, _) => window.OpenFile(initialFile);
-            }
+                if (initialFile is null && MainWindowViewModel.RecoveryFileExists)
+                {
+                    await window.AskRestoreRecoveryAsync();
+                }
+
+                if (initialFile is not null)
+                {
+                    window.OpenFile(initialFile);
+                }
+            };
         }
 
         base.OnFrameworkInitializationCompleted();

@@ -23,10 +23,15 @@ public enum BannerKind
 
 public sealed record PlacementRow(string Text, IBrush Brush);
 
+internal sealed record DocumentSnapshot(PuzzleDocument Document, string? SelectedPieceId);
+
 public sealed partial class MainWindowViewModel : ObservableObject
 {
     private readonly PuzzlerRunner _runner;
     private readonly DispatcherTimer _timer;
+    private readonly Stack<DocumentSnapshot> _undoStack = new();
+    private readonly Stack<DocumentSnapshot> _redoStack = new();
+    private DocumentSnapshot? _baseline;
     private PuzzleDocument _document;
     private PieceModel? _selectedPiece;
     private GridData? _boardSurface;
@@ -73,6 +78,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
         SelectedPiece = _document.Pieces.FirstOrDefault();
         RefreshDocumentState(markDirty: false);
+        _baseline = CaptureSnapshot();
         UpdateSolverStatus();
 
         _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
@@ -283,6 +289,10 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     public string WindowTitle => $"puzzler-gui — {CurrentFileName}{(_isDirty ? " *" : string.Empty)}";
 
+    public bool CanUndo => _undoStack.Count > 0 && !_isSolving;
+
+    public bool CanRedo => _redoStack.Count > 0 && !_isSolving;
+
     public bool IsSolving
     {
         get => _isSolving;
@@ -294,6 +304,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
             }
 
             OnPropertyChanged(nameof(IsNotSolving));
+            OnPropertyChanged(nameof(CanUndo));
+            OnPropertyChanged(nameof(CanRedo));
             UpdateCommandStates();
         }
     }
@@ -518,11 +530,16 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     public string SamplesDirectory => Path.Combine(AppContext.BaseDirectory, "samples");
 
+    public static string RecoveryFile => Path.Combine(SettingsStore.ConfigDirectory, "recovery.pzle");
+
+    public static bool RecoveryFileExists => File.Exists(RecoveryFile);
+
     // ---------------------------------------------------------------- document
 
     public void NewDocument()
     {
         SetDocument(PuzzleDocument.CreateDefault(), null);
+        ClearRecovery();
         StatusText = "New puzzle";
         ClearBanner();
     }
@@ -535,6 +552,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
             var text = File.ReadAllText(path);
             var document = PuzzleYaml.Load(text);
             SetDocument(document, Path.GetFullPath(path));
+            ClearRecovery();
             StatusText = $"Opened {Path.GetFileName(path)}";
             ClearBanner();
             AddRecent(path);
@@ -560,6 +578,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
             File.WriteAllText(path, PuzzleYaml.Save(_document));
             CurrentFilePath = Path.GetFullPath(path);
             IsDirty = false;
+            ClearRecovery();
             StatusText = $"Saved {Path.GetFileName(path)}";
             AddRecent(path);
             return true;
@@ -600,11 +619,65 @@ public sealed partial class MainWindowViewModel : ObservableObject
         SettingsStore.Save(Settings);
     }
 
+    public static string? ReadRecoveryText() =>
+        File.Exists(RecoveryFile) ? File.ReadAllText(RecoveryFile) : null;
+
+    public bool TryLoadRecoveryText(string text)
+    {
+        try
+        {
+            SetDocument(PuzzleYaml.Load(text), null);
+            ClearRecovery();
+            StatusText = "Restored the recovered puzzle";
+            ClearBanner();
+            return true;
+        }
+        catch (PuzzleFormatException)
+        {
+            ClearRecovery();
+            return false;
+        }
+    }
+
+    public void DiscardRecovery() => ClearRecovery();
+
+    public void PrepareForCleanExit() => ClearRecovery();
+
     public void PaintBoardCell(int row, int column, bool filled) =>
         _document.Board.SetCell(row, column, filled);
 
     public void PaintPieceCell(int row, int column, bool filled) =>
         _selectedPiece?.Shape.SetCell(row, column, filled);
+
+    [RelayCommand(CanExecute = nameof(CanUndo))]
+    private void Undo()
+    {
+        if (!CanUndo)
+        {
+            return;
+        }
+
+        var current = CaptureSnapshot();
+        var previous = _undoStack.Pop();
+        _redoStack.Push(current);
+        ApplySnapshot(previous);
+        StatusText = "Undid last change";
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRedo))]
+    private void Redo()
+    {
+        if (!CanRedo)
+        {
+            return;
+        }
+
+        var current = CaptureSnapshot();
+        var next = _redoStack.Pop();
+        _undoStack.Push(current);
+        ApplySnapshot(next);
+        StatusText = "Redid change";
+    }
 
     [RelayCommand]
     private void FillBoard() => _document.Board.SetAll(true);
@@ -874,6 +947,9 @@ public sealed partial class MainWindowViewModel : ObservableObject
         ClearReport();
         OnPropertyChanged(nameof(BoardWidthValue));
         OnPropertyChanged(nameof(BoardHeightValue));
+        _undoStack.Clear();
+        _redoStack.Clear();
+        _baseline = CaptureSnapshot();
         UpdateCommandStates();
     }
 
@@ -885,10 +961,71 @@ public sealed partial class MainWindowViewModel : ObservableObject
         }
 
         _revision++;
+        if (!SameAsBaseline())
+        {
+            _undoStack.Push(_baseline ?? CaptureSnapshot());
+            _redoStack.Clear();
+            _baseline = CaptureSnapshot();
+        }
+
         RefreshDocumentState(markDirty: true);
+        PersistRecovery();
         if (_lastReport is not null)
         {
             SolutionsStale = true;
+        }
+    }
+
+    private DocumentSnapshot CaptureSnapshot() =>
+        new(_document.Clone(), _selectedPiece?.Id);
+
+    private bool SameAsBaseline() =>
+        _baseline is not null &&
+        string.Equals(PuzzleYaml.Save(_baseline.Document), PuzzleYaml.Save(_document), StringComparison.Ordinal);
+
+    private void ApplySnapshot(DocumentSnapshot snapshot)
+    {
+        _document.Changed -= OnDocumentChanged;
+        _document = snapshot.Document;
+        _document.Changed += OnDocumentChanged;
+        OnPropertyChanged(nameof(Document));
+
+        SelectedPiece = _document.Pieces.FirstOrDefault(piece => piece.Id == snapshot.SelectedPieceId)
+                        ?? _document.Pieces.FirstOrDefault();
+        RefreshDocumentState(markDirty: true);
+        ClearReport();
+        _baseline = CaptureSnapshot();
+        PersistRecovery();
+        OnPropertyChanged(nameof(BoardWidthValue));
+        OnPropertyChanged(nameof(BoardHeightValue));
+        UpdateCommandStates();
+    }
+
+    private void PersistRecovery()
+    {
+        try
+        {
+            Directory.CreateDirectory(SettingsStore.ConfigDirectory);
+            File.WriteAllText(RecoveryFile, PuzzleYaml.Save(_document));
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // Recovery is best-effort; the editor remains usable if it cannot write.
+        }
+    }
+
+    private void ClearRecovery()
+    {
+        try
+        {
+            if (File.Exists(RecoveryFile))
+            {
+                File.Delete(RecoveryFile);
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // Ignore cleanup failures; they do not block editing.
         }
     }
 
@@ -1099,6 +1236,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
     private void UpdateCommandStates()
     {
+        UndoCommand.NotifyCanExecuteChanged();
+        RedoCommand.NotifyCanExecuteChanged();
         AddPieceCommand.NotifyCanExecuteChanged();
         RemovePieceCommand.NotifyCanExecuteChanged();
         DuplicatePieceCommand.NotifyCanExecuteChanged();

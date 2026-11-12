@@ -37,6 +37,11 @@
         <MenuItem Header="_Exit" Click="OnExitClick" />
       </MenuItem>
 
+      <MenuItem Header="_Edit">
+        <MenuItem Header="_Undo" InputGesture="Ctrl+Z" Command="{Binding UndoCommand}" />
+        <MenuItem Header="_Redo" InputGesture="Ctrl+Y" Command="{Binding RedoCommand}" />
+      </MenuItem>
+
       <MenuItem Header="_Solve">
         <MenuItem Header="_Solve puzzle" InputGesture="F5" Click="OnSolveClick" />
         <MenuItem Header="_Cancel search" Click="OnCancelClick" />
@@ -44,7 +49,7 @@
         <MenuItem Header="_Validate with puzzler" Click="OnValidateClick" />
       </MenuItem>
 
-      <MenuItem Header="S_ettings">
+      <MenuItem Header="Set_tings">
         <MenuItem Header="_Solver &amp; preferences…" Click="OnSettingsClick" />
       </MenuItem>
 

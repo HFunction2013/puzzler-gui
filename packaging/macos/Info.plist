@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleName</key>
+  <string>puzzler-gui</string>
+  <key>CFBundleDisplayName</key>
+  <string>puzzler-gui</string>
+  <key>CFBundleIdentifier</key>
+  <string>com.hfunction2013.puzzler-gui</string>
+  <key>CFBundleVersion</key>
+  <string>@VERSION@</string>
+  <key>CFBundleShortVersionString</key>
+  <string>@VERSION@</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>CFBundleExecutable</key>
+  <string>PuzzlerGui</string>
+  <key>CFBundleIconFile</key>
+  <string>puzzler-gui.png</string>
+  <key>LSMinimumSystemVersion</key>
+  <string>11.0</string>
+  <key>NSHighResolutionCapable</key>
+  <true/>
+  <key>CFBundleDocumentTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleTypeName</key>
+      <string>puzzler puzzle</string>
+      <key>CFBundleTypeRole</key>
+      <string>Editor</string>
+      <key>LSItemContentTypes</key>
+      <array>
+        <string>com.hfunction2013.pzle</string>
+      </array>
+      <key>CFBundleTypeExtensions</key>
+      <array>
+        <string>pzle</string>
+      </array>
+      <key>CFBundleTypeIconFile</key>
+      <string>puzzler-gui.png</string>
+    </dict>
+  </array>
+  <key>UTExportedTypeDeclarations</key>
+  <array>
+    <dict>
+      <key>UTTypeIdentifier</key>
+      <string>com.hfunction2013.pzle</string>
+      <key>UTTypeDescription</key>
+      <string>puzzler puzzle</string>
+      <key>UTTypeConformsTo</key>
+      <array>
+        <string>public.data</string>
+      </array>
+      <key>UTTypeTagSpecification</key>
+      <dict>
+        <key>public.filename-extension</key>
+        <array>
+          <string>pzle</string>
+        </array>
+      </dict>
+    </dict>
+  </array>
+</dict>
+</plist>

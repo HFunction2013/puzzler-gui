@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=puzzler-gui
+GenericName=Puzzle Solver
+Comment=Edit and solve exact-cover polyomino puzzles
+Exec=@EXEC@ %f
+Icon=puzzler-gui
+Terminal=false
+Categories=Education;Utility;
+MimeType=application/x-pzle;
+Keywords=puzzle;polyomino;tiling;solver;

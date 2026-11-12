@@ -17,6 +17,9 @@ solver, and flip through every distinct tiling without touching a terminal.
 - **Real `.pzle` files** — opens the YAML dialect used by puzzler, including the
   `puzzle:` wrapper and the flat `- key: value` form, `rectangle{w,h}` boards and
   ASCII board/shape blocks. Saving writes a canonical, human-readable file.
+- **Editor history** — `Ctrl+Z` undoes the last puzzle edit and `Ctrl+Y` or
+  `Ctrl+Shift+Z` redoes it. Unsaved work is kept in a private recovery file; if
+  the application exits forcibly, the next launch asks whether to restore it.
 - **Solver integration** — calls the `puzzler` executable with the current
   puzzle and passes through the solution limit, node limit, time limit, colour
   seed, symmetry-deduplication switch and the compact-JSON (`--compress`)
@@ -85,9 +88,19 @@ Tagged builds (`v*`) publish self-contained archives for:
 Each archive contains the GUI, the `puzzler` solver for that platform, and the
 sample puzzles. Windows x64 also ships an MSI installer that lets you choose the
 install location, create optional Start Menu and Desktop shortcuts, and register
-`.pzle` files with `puzzler-gui`. `SHA256SUMS.txt` is attached to every release.
-The release workflow builds the solver from the companion repository
-[HFunction2013/puzzler](https://github.com/HFunction2013/puzzler).
+`.pzle` files with `puzzler-gui`.
+
+- **macOS:** the release archive contains `PuzzlerGui.app`, whose `Info.plist`
+  declares the `.pzle` document type; opening a `.pzle` file launches the GUI.
+- **Linux:** unpack the archive and run `linux/install-linux.sh` to install the
+  desktop entry, MIME type, icon and `puzzler-gui` launcher under
+  `~/.local`. This registers `.pzle` files with the GUI in desktop environments
+  that follow the FreeDesktop specification.
+
+The GUI release workflow downloads the latest prebuilt solver from the
+[HFunction2013/puzzler](https://github.com/HFunction2013/puzzler) release
+assets; it does not compile Rust during GUI packaging. `SHA256SUMS.txt` is
+attached to every release.
 
 ## Keyboard shortcuts
 
@@ -97,11 +110,13 @@ The release workflow builds the solver from the companion repository
 | `Ctrl+O` | Open `.pzle` |
 | `Ctrl+S` | Save |
 | `Ctrl+Shift+S` | Save as |
+| `Ctrl+Z` | Undo last edit |
+| `Ctrl+Y` / `Ctrl+Shift+Z` | Redo |
 | `F5` | Solve |
 | `Esc` | Cancel the running search |
 | `←` / `→` | Previous / next solution |
 | `Home` / `End` | First / last solution |
-| `Alt+F` / `Alt+S` / `Alt+E` / `Alt+V` / `Alt+H` | Open File / Solve / Settings / View / Help menu |
+| `Alt+F` / `Alt+E` / `Alt+S` / `Alt+T` / `Alt+V` / `Alt+H` | Open File / Edit / Solve / Settings / View / Help menu |
 
 ## Puzzle format
 

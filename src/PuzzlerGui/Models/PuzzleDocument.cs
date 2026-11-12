@@ -59,6 +59,23 @@ public sealed partial class PuzzleDocument : ObservableObject
         return document;
     }
 
+    public PuzzleDocument Clone()
+    {
+        var copy = new PuzzleDocument(Name, Board.Clone())
+        {
+            AllUse = AllUse,
+            CanRotate = CanRotate,
+            CanFlip = CanFlip,
+        };
+
+        foreach (var piece in Pieces)
+        {
+            copy.Pieces.Add(piece.Clone());
+        }
+
+        return copy;
+    }
+
     public void Validate(out IReadOnlyList<string> errors, out IReadOnlyList<string> warnings)
     {
         var errorList = new List<string>();

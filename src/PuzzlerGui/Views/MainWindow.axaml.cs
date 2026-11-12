@@ -43,6 +43,32 @@ public sealed partial class MainWindow : Window
 
     public void OpenFile(string path) => _ = OpenPathAsync(path, confirmDiscard: false);
 
+    public async Task AskRestoreRecoveryAsync()
+    {
+        var recoveryText = MainWindowViewModel.ReadRecoveryText();
+        if (string.IsNullOrWhiteSpace(recoveryText))
+        {
+            return;
+        }
+
+        var result = await new MessageDialog(
+            "Recover puzzle",
+            "An unsaved puzzle was found from the previous session. Restore it?",
+            "Restore",
+            "Discard",
+            "Cancel").ShowAsync(this);
+
+        switch (result)
+        {
+            case "Restore":
+                ViewModel.TryLoadRecoveryText(recoveryText);
+                break;
+            case "Discard":
+                ViewModel.DiscardRecovery();
+                break;
+        }
+    }
+
     protected override void OnKeyDown(KeyEventArgs e)
     {
         base.OnKeyDown(e);
@@ -68,6 +94,22 @@ public sealed partial class MainWindow : Window
         {
             e.Handled = true;
             _ = SaveAsync(forceDialog: shift);
+        }
+        else if (control && !shift && e.Key == Key.Z)
+        {
+            e.Handled = true;
+            if (ViewModel.UndoCommand.CanExecute(null))
+            {
+                ViewModel.UndoCommand.Execute(null);
+            }
+        }
+        else if (control && (e.Key == Key.Y || (shift && e.Key == Key.Z)))
+        {
+            e.Handled = true;
+            if (ViewModel.RedoCommand.CanExecute(null))
+            {
+                ViewModel.RedoCommand.Execute(null);
+            }
         }
         else if (e.Key == Key.F5)
         {
@@ -165,6 +207,7 @@ public sealed partial class MainWindow : Window
 
         if (!viewModel.IsDirty)
         {
+            viewModel.PrepareForCleanExit();
             base.OnClosing(e);
             return;
         }
@@ -213,9 +256,15 @@ public sealed partial class MainWindow : Window
         return result switch
         {
             "Save" => await SaveAsync(forceDialog: false),
-            "Discard" => true,
+            "Discard" => DiscardAndPrepare(),
             _ => false,
         };
+
+        bool DiscardAndPrepare()
+        {
+            ViewModel.PrepareForCleanExit();
+            return true;
+        }
     }
 
     private async Task NewDocumentAsync()

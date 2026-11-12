@@ -9,7 +9,7 @@ on:
       version:
         description: Version to stamp into the build (without a leading v)
         required: false
-        default: '0.1.4'
+        default: '0.1.5'
 
 permissions:
   contents: write
@@ -25,23 +25,28 @@ jobs:
           - os: ubuntu-latest
             rid: linux-x64
             archive: tar.gz
-            cargo_target: ''
+            solver_target: x86_64-unknown-linux-gnu
+            solver_archive: tar.gz
           - os: windows-latest
             rid: win-x64
             archive: zip
-            cargo_target: ''
+            solver_target: x86_64-pc-windows-msvc
+            solver_archive: zip
           - os: macos-15-intel
             rid: osx-x64
             archive: tar.gz
-            cargo_target: x86_64-apple-darwin
+            solver_target: x86_64-apple-darwin
+            solver_archive: tar.gz
           - os: macos-15
             rid: osx-arm64
             archive: tar.gz
-            cargo_target: aarch64-apple-darwin
+            solver_target: aarch64-apple-darwin
+            solver_archive: tar.gz
 
     env:
       RID: ${{ matrix.rid }}
-      CARGO_TARGET: ${{ matrix.cargo_target }}
+      SOLVER_TARGET: ${{ matrix.solver_target }}
+      SOLVER_ARCHIVE: ${{ matrix.solver_archive }}
 
     steps:
       - name: Check out puzzler-gui
@@ -54,7 +59,7 @@ jobs:
             VERSION="${GITHUB_REF_NAME#v}"
           else
             VERSION="${{ github.event.inputs.version }}"
-            if [ -z "$VERSION" ]; then VERSION="0.1.4"; fi
+            if [ -z "$VERSION" ]; then VERSION="0.1.5"; fi
           fi
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "Building puzzler-gui $VERSION for $RID"
@@ -64,27 +69,21 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Add macOS cross target
-        if: matrix.cargo_target != ''
-        run: rustup target add ${{ matrix.cargo_target }}
-
-      - name: Check out the puzzler solver
-        uses: actions/checkout@v4
-        with:
-          repository: HFunction2013/puzzler
-          path: cli
-
-      - name: Build the solver
+      - name: Download latest puzzler solver
         shell: bash
         run: |
-          if [ -n "$CARGO_TARGET" ]; then
-            cargo build --release --manifest-path cli/Cargo.toml --target "$CARGO_TARGET"
+          mkdir -p solver
+          gh release download --repo HFunction2013/puzzler \
+            --pattern "puzzler-*-${SOLVER_TARGET}.${SOLVER_ARCHIVE}" \
+            --dir solver
+
+          if [ "$SOLVER_ARCHIVE" = "zip" ]; then
+            unzip solver/*.zip -d solver
           else
-            cargo build --release --manifest-path cli/Cargo.toml
+            tar -xzf solver/*.tar.gz -C solver --strip-components=1
           fi
+
+          find solver -maxdepth 2 -type f -name 'puzzler*' -print
 
       - name: Publish the GUI
         run: >-
@@ -100,21 +99,35 @@ jobs:
       - name: Stage solver and documents
         shell: bash
         run: |
-          if [ -n "$CARGO_TARGET" ]; then
-            SOLVER="cli/target/$CARGO_TARGET/release/puzzler"
-          else
-            SOLVER="cli/target/release/puzzler"
-          fi
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            SOLVER="$SOLVER.exe"
-          fi
+          SOLVER="$(find solver -type f \( -name 'puzzler' -o -name 'puzzler.exe' \) | head -1)"
+          test -n "$SOLVER"
           cp "$SOLVER" publish/
           cp README.md LICENSE publish/
           cp src/PuzzlerGui/Assets/puzzler-gui.ico publish/
+          cp src/PuzzlerGui/Assets/puzzler-gui.png publish/
+
+          if [ "${{ runner.os }}" = "Linux" ]; then
+            mkdir -p publish/linux
+            cp packaging/linux/* publish/linux/
+            chmod +x publish/linux/install-linux.sh
+          fi
 
           # Keep release archives clean: no debug symbols or XML documentation.
-          find publish -type f \( -name '*.pdb' -o -name '*.xml' \) -delete
+          # The Linux MIME package keeps its required .xml file under linux/.
+          find publish -type f \( -name '*.pdb' -o -name '*.xml' \) ! -path '*/linux/*' -delete
           ls -la publish
+
+      - name: Build macOS app bundle
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          APP="publish/PuzzlerGui.app/Contents"
+          mkdir -p "$APP/MacOS" "$APP/Resources"
+          find publish -maxdepth 1 -mindepth 1 ! -name 'PuzzlerGui.app' -exec mv {} "$APP/MacOS/" \;
+          sed "s/@VERSION@/$VERSION/g" packaging/macos/Info.plist > "$APP/Info.plist"
+          cp src/PuzzlerGui/Assets/puzzler-gui.png "$APP/Resources/"
+          chmod +x "$APP/MacOS/PuzzlerGui"
+          find publish/PuzzlerGui.app -maxdepth 3 -type f | sort
 
       - name: Package (Unix)
         if: runner.os != 'Windows'
@@ -179,12 +192,15 @@ jobs:
             front-end for the [`puzzler`](https://github.com/HFunction2013/puzzler)
             exact-cover solver.
 
-            Each archive is self-contained: it includes the GUI and a matching
-            `puzzler` executable, so no .NET runtime or Rust toolchain is needed.
-            Unpack the archive for your platform and start `PuzzlerGui`
-            (`PuzzlerGui.exe` on Windows). Windows x64 also has an MSI installer
-            that supports a custom install folder, optional shortcuts, and
-            opening `.pzle` files from Explorer.
+            Each archive is self-contained: it includes the GUI and the latest
+            prebuilt `puzzler` executable from the puzzler release, so no .NET
+            runtime or Rust toolchain is needed. Unpack the archive for your
+            platform and start `PuzzlerGui` (`PuzzlerGui.exe` on Windows).
+            Windows x64 also has an MSI installer that supports a custom install
+            folder, optional shortcuts, and opening `.pzle` files from Explorer.
+            The macOS archive is a `.app` bundle that declares `.pzle`; the Linux
+            archive includes `linux/install-linux.sh` for desktop/MIME
+            registration.
 
             Verify the downloads with `SHA256SUMS.txt` attached below.
           files: |

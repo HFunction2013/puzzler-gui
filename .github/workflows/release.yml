@@ -70,6 +70,8 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Download latest puzzler solver
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
           mkdir -p solver

@@ -35,12 +35,9 @@ public sealed partial class App : Application
                 if (string.IsNullOrEmpty(settings.Language))
                 {
                     var languageDialog = new LanguageWindow();
-                    var accepted = await languageDialog.ShowDialog<bool?>(window);
-                    if (accepted == true)
-                    {
-                        settings.Language = LocalizationService.Instance.CurrentLanguage;
-                        SettingsStore.Save(settings);
-                    }
+                    await languageDialog.ShowDialog<bool?>(window);
+                    settings.Language = LocalizationService.Instance.CurrentLanguage;
+                    SettingsStore.Save(settings);
                 }
 
                 if (initialFile is null && MainWindowViewModel.RecoveryFileExists)

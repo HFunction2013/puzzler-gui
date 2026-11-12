@@ -31,11 +31,14 @@ public sealed class LocalizationTests
         Assert.Equal(expected, service.CurrentLanguage);
     }
 
-    [Fact]
-    public void Apply_UnknownLanguage_FallsBackToDetectedLanguage()
+    [Theory]
+    [InlineData("xx-XX")]
+    [InlineData("")]
+    [InlineData(null)]
+    public void Apply_UnsupportedLanguage_FallsBackToDetectedLanguage(string? requested)
     {
         var service = LocalizationService.Instance;
-        service.Apply("xx-XX");
+        service.Apply(requested);
         Assert.Contains(service.CurrentLanguage, new[] { "en", "zh-CN", "zh-TW", "ja" });
     }
 

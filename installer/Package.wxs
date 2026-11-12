@@ -25,7 +25,8 @@
       <Publish Dialog="ExitDialog"
                 Control="Finish"
                 Event="DoAction"
-                Value="Wix4ShellExec_X64">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+                Value="Wix4ShellExec_X64"
+                Condition="WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed" />
     </UI>
 
     <Icon Id="AppIcon" SourceFile="puzzler-gui.ico" />

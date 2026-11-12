@@ -1,7 +1,7 @@
 <Project Sdk="WixToolset.Sdk/6.0.2">
 
   <PropertyGroup>
-    <Version>0.1.4</Version>
+    <Version>0.1.7</Version>
     <Platform>x64</Platform>
     <OutputName>puzzler-gui-$(Version)-win-x64</OutputName>
     <PublishDir>../publish</PublishDir>
@@ -11,6 +11,7 @@
   <ItemGroup>
     <PackageReference Include="WixToolset.Heat" Version="6.0.2" />
     <PackageReference Include="WixToolset.UI.wixext" Version="6.0.2" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="6.0.2" />
   </ItemGroup>
 
   <ItemGroup>

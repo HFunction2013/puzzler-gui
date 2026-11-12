@@ -12,7 +12,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
-    <Version>0.1.6</Version>
+    <Version>0.1.7</Version>
     <Authors>HFunction2013</Authors>
     <Product>puzzler-gui</Product>
     <Description>Cross-platform desktop front-end for the puzzler exact-cover solver.</Description>

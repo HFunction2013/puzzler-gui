@@ -7,6 +7,8 @@ namespace PuzzlerGui.Views;
 
 public sealed partial class SettingsWindow : Window
 {
+    private readonly string _originalLanguageCode;
+
     public LocalizationService Loc { get; }
 
     public SettingsWindow()
@@ -17,6 +19,7 @@ public sealed partial class SettingsWindow : Window
     public SettingsWindow(AppSettings settings)
     {
         Loc = LocalizationService.Instance;
+        _originalLanguageCode = Loc.CurrentLanguage;
         InitializeComponent();
         DataContext = this;
 
@@ -24,6 +27,7 @@ public sealed partial class SettingsWindow : Window
         LanguageBox.ItemsSource = Loc.Languages;
         LanguageBox.SelectedItem = Loc.Languages.FirstOrDefault(option => option.Code == Loc.CurrentLanguage)
             ?? Loc.Languages[0];
+        LanguageBox.SelectionChanged += OnLanguageChanged;
         UpdateStatus();
     }
 
@@ -41,7 +45,7 @@ public sealed partial class SettingsWindow : Window
             AllowMultiple = false,
             FileTypeFilter = new[]
             {
-                new FilePickerFileType("Executables")
+                new FilePickerFileType(Loc["file.executableFilter"])
                 {
                     Patterns = OperatingSystem.IsWindows()
                         ? new[] { "*.exe" }
@@ -77,6 +81,15 @@ public sealed partial class SettingsWindow : Window
         UpdateStatus();
     }
 
+    private void OnLanguageChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (LanguageBox.SelectedItem is LanguageOption selected && selected.Code != Loc.CurrentLanguage)
+        {
+            Loc.SetLanguage(selected.Code);
+            UpdateStatus();
+        }
+    }
+
     private void UpdateStatus()
     {
         var found = PuzzlerRunner.LocateSolver(SolverPath);
@@ -87,5 +100,9 @@ public sealed partial class SettingsWindow : Window
 
     private void OnOkClick(object? sender, RoutedEventArgs e) => Close(true);
 
-    private void OnCancelClick(object? sender, RoutedEventArgs e) => Close(false);
+    private void OnCancelClick(object? sender, RoutedEventArgs e)
+    {
+        Loc.SetLanguage(_originalLanguageCode);
+        Close(false);
+    }
 }

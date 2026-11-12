@@ -252,13 +252,13 @@
                   <TextBlock Classes="hint" Text="{Binding Loc[solver.maxSolutions]}" />
                   <NumericUpDown Value="{Binding LimitSolutions, Mode=TwoWay}"
                                  Minimum="1" Maximum="1000000" Increment="1"
-                                 FormatString="0" Watermark="all" />
+                                 FormatString="0" Watermark="{Binding Loc[watermark.all]}" />
                 </StackPanel>
                 <StackPanel Grid.Column="2" Spacing="2">
                   <TextBlock Classes="hint" Text="{Binding Loc[solver.nodeLimit]}" />
                   <NumericUpDown Value="{Binding NodeLimit, Mode=TwoWay}"
                                  Minimum="1" Maximum="1000000000000" Increment="1000"
-                                 FormatString="0" Watermark="none" />
+                                 FormatString="0" Watermark="{Binding Loc[watermark.none]}" />
                 </StackPanel>
               </Grid>
 
@@ -267,13 +267,13 @@
                   <TextBlock Classes="hint" Text="{Binding Loc[solver.timeLimit]}" />
                   <NumericUpDown Value="{Binding TimeLimit, Mode=TwoWay}"
                                  Minimum="0" Maximum="86400" Increment="0.5"
-                                 FormatString="0.###" Watermark="none" />
+                                 FormatString="0.###" Watermark="{Binding Loc[watermark.none]}" />
                 </StackPanel>
                 <StackPanel Grid.Column="2" Spacing="2">
                   <TextBlock Classes="hint" Text="{Binding Loc[solver.seed]}" />
                   <NumericUpDown Value="{Binding SeedValue, Mode=TwoWay}"
                                  Minimum="0" Maximum="1000000000000" Increment="1"
-                                 FormatString="0" Watermark="clock" />
+                                 FormatString="0" Watermark="{Binding Loc[watermark.clock]}" />
                 </StackPanel>
               </Grid>
 

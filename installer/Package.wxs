@@ -16,6 +16,18 @@
     <ui:WixUI Id="WixUI_Mondo" InstallDirectory="INSTALLFOLDER" />
     <WixVariable Id="WixUILicenseRtf" Value="LICENSE.rtf" />
 
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch puzzler-gui" />
+    <Property Id="WixShellExecTarget" Value="[INSTALLFOLDER]PuzzlerGui.exe" />
+    <CustomActionRef Id="Wix4ShellExec_X64" />
+
+    <UI>
+      <Publish Dialog="ExitDialog"
+                Control="Finish"
+                Event="DoAction"
+                Value="Wix4ShellExec_X64">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+    </UI>
+
     <Icon Id="AppIcon" SourceFile="puzzler-gui.ico" />
 
     <Feature Id="Main" Title="puzzler-gui" Description="The GUI application and puzzler solver." Level="1" ConfigurableDirectory="INSTALLFOLDER">

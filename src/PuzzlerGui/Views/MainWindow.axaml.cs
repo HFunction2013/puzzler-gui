@@ -294,15 +294,18 @@ public sealed partial class MainWindow : Window
 
         var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title = "Open puzzle",
+            Title = Loc["file.openTitle"],
             AllowMultiple = false,
             FileTypeFilter = new[]
             {
-                new FilePickerFileType("Puzzle files (*.pzle)")
+                new FilePickerFileType(Loc["file.puzzleFilter"])
                 {
                     Patterns = new[] { "*.pzle" },
                 },
-                FilePickerFileTypes.All,
+                new FilePickerFileType(Loc["file.allFiles"])
+                {
+                    Patterns = new[] { "*" },
+                },
             },
         });
 
@@ -314,7 +317,7 @@ public sealed partial class MainWindow : Window
         var path = files[0].TryGetLocalPath();
         if (path is null)
         {
-            await ShowError("Cannot open file", "The selected file has no local path.");
+            await ShowError(Loc["error.cannotOpenFile"], Loc["error.noLocalPath"]);
             return;
         }
 
@@ -330,7 +333,7 @@ public sealed partial class MainWindow : Window
 
         if (!ViewModel.LoadFile(path, out var error))
         {
-            await ShowError("Cannot open puzzle", error ?? "Unknown error.");
+            await ShowError(Loc["error.cannotOpenPuzzle"], error ?? Loc["error.unknown"]);
             return false;
         }
 
@@ -345,14 +348,14 @@ public sealed partial class MainWindow : Window
         {
             var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
             {
-                Title = "Save puzzle",
+                Title = Loc["file.saveTitle"],
                 SuggestedFileName = viewModel.CurrentFilePath is null
-                    ? "puzzle.pzle"
+                    ? Loc["file.defaultPuzzleName"]
                     : Path.GetFileName(viewModel.CurrentFilePath),
                 DefaultExtension = "pzle",
                 FileTypeChoices = new[]
                 {
-                    new FilePickerFileType("Puzzle files (*.pzle)")
+                    new FilePickerFileType(Loc["file.puzzleFilter"])
                     {
                         Patterns = new[] { "*.pzle" },
                     },
@@ -369,7 +372,7 @@ public sealed partial class MainWindow : Window
 
         if (!viewModel.SaveTo(path, out var error))
         {
-            await ShowError("Cannot save puzzle", error ?? "Unknown error.");
+            await ShowError(Loc["error.cannotSavePuzzle"], error ?? Loc["error.unknown"]);
             return false;
         }
 
@@ -377,7 +380,7 @@ public sealed partial class MainWindow : Window
     }
 
     private async Task ShowError(string title, string message) =>
-        await new MessageDialog(title, message, "OK").ShowAsync(this);
+        await new MessageDialog(title, message, Loc["dialog.ok"]).ShowAsync(this);
 
     // ------------------------------------------------------------------ menu
 
@@ -399,7 +402,7 @@ public sealed partial class MainWindow : Window
         var path = Path.Combine(ViewModel.SamplesDirectory, fileName);
         if (!File.Exists(path))
         {
-            await ShowError("Sample not found", $"Expected the sample at:\n{path}");
+            await ShowError(Loc["error.sampleNotFound"], string.Format(Loc["error.sampleNotFoundAt"], path));
             return;
         }
 
@@ -474,17 +477,17 @@ public sealed partial class MainWindow : Window
         var name = ViewModel.Document.Name;
         if (string.IsNullOrWhiteSpace(name))
         {
-            name = "puzzle";
+            name = Loc["file.untitled"];
         }
 
         var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
-            Title = "Export solutions",
+            Title = Loc["file.exportTitle"],
             SuggestedFileName = $"{name}-solutions.json",
             DefaultExtension = "json",
             FileTypeChoices = new[]
             {
-                new FilePickerFileType("JSON files (*.json)")
+                new FilePickerFileType(Loc["file.jsonFilter"])
                 {
                     Patterns = new[] { "*.json" },
                 },
@@ -499,7 +502,7 @@ public sealed partial class MainWindow : Window
         var path = file.TryGetLocalPath() ?? file.Path.LocalPath;
         if (!ViewModel.SaveReportJson(path, out var error))
         {
-            await ShowError("Cannot export report", error ?? "Unknown error.");
+            await ShowError(Loc["error.cannotExport"], error ?? Loc["error.unknown"]);
         }
     }
 
@@ -535,6 +538,6 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        await ShowError("Unsupported file", "Drop a .pzle puzzle file to open it.");
+        await ShowError(Loc["error.unsupportedFile"], Loc["error.unsupportedFileMessage"]);
     }
 }

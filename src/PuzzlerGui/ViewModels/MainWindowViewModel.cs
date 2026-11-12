@@ -85,13 +85,25 @@ public sealed partial class MainWindowViewModel : ObservableObject
         ValidationText = Loc["solver.validationFallback"];
         Loc.PropertyChanged += (_, args) =>
         {
-            if (args.PropertyName is nameof(LocalizationService.Strings) or "Item[]")
+            if (args.PropertyName is not nameof(LocalizationService.Strings) and not "Item[]")
             {
-                OnPropertyChanged(nameof(BoardSummary));
-                OnPropertyChanged(nameof(EmptyHintText));
-                OnPropertyChanged(nameof(SolutionsTabHeader));
-                OnPropertyChanged(nameof(SolverStatusText));
+                return;
             }
+
+            OnPropertyChanged(nameof(Loc));
+            OnPropertyChanged(nameof(WindowTitle));
+            OnPropertyChanged(nameof(CurrentFileName));
+            OnPropertyChanged(nameof(BoardSummary));
+            OnPropertyChanged(nameof(EmptyHintText));
+            OnPropertyChanged(nameof(SolutionsTabHeader));
+            OnPropertyChanged(nameof(SolverStatusText));
+            OnPropertyChanged(nameof(SolutionIndexLabel));
+            if (_validationValid)
+            {
+                ValidationText = Loc["solver.validationFallback"];
+            }
+
+            UpdateSolutionView();
         };
 
         _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
@@ -288,7 +300,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     }
 
     public string CurrentFileName =>
-        _currentFilePath is null ? "untitled" : Path.GetFileName(_currentFilePath);
+        _currentFilePath is null ? Loc["file.untitled"] : Path.GetFileName(_currentFilePath);
 
     public bool IsDirty
     {
@@ -393,7 +405,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     public string BoardSummary =>
         $"{_document.Board.Width} × {_document.Board.Height} {Loc["board.summaryBoard"]}  ·  " +
         $"{_document.Board.PlayableCells} {Loc["board.playableCells"]}  ·  " +
-        $"{_document.TotalPieceCells} cells across {_document.PieceTypes} {Loc["board.pieceTypes"]}";
+        $"{_document.TotalPieceCells} {Loc["board.cellAcross"]} {_document.PieceTypes} {Loc["board.pieceTypes"]}";
 
     public bool ValidationValid
     {
@@ -539,7 +551,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
     }
 
     public string SolverPathText =>
-        _runner.FindSolver() ?? "No puzzler executable was found next to the app or on PATH.";
+        _runner.FindSolver() ?? Loc["dialog.solverNotFound"];
 
     public bool SolverFound => _runner.FindSolver() is not null;
 

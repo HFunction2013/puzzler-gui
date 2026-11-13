@@ -9,7 +9,7 @@ on:
       version:
         description: Version to stamp into the build (without a leading v)
         required: false
-        default: '0.1.10'
+        default: '0.1.11'
 
 permissions:
   contents: write
@@ -59,7 +59,7 @@ jobs:
             VERSION="${GITHUB_REF_NAME#v}"
           else
             VERSION="${{ github.event.inputs.version }}"
-            if [ -z "$VERSION" ]; then VERSION="0.1.10"; fi
+            if [ -z "$VERSION" ]; then VERSION="0.1.11"; fi
           fi
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "Building puzzler-gui $VERSION for $RID"

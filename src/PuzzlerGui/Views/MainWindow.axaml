@@ -337,18 +337,18 @@
             <Border DockPanel.Dock="Top" Padding="0,0,0,8">
               <Grid ColumnDefinitions="Auto,*,Auto">
                 <StackPanel Orientation="Horizontal" Spacing="6">
-                  <Button Classes="nav" Content="⏮" ToolTip.Tip="{Binding Strings[solution.first]}"
+                  <Button Classes="nav" Content="{Binding Strings[solution.firstShort]}" ToolTip.Tip="{Binding Strings[solution.first]}"
                           Command="{Binding FirstSolutionCommand}" />
-                  <Button Classes="nav" Content="◀" ToolTip.Tip="{Binding Strings[solution.previous]}"
+                  <Button Classes="nav" Content="{Binding Strings[solution.previousShort]}" ToolTip.Tip="{Binding Strings[solution.previous]}"
                           Command="{Binding PreviousSolutionCommand}" />
                   <TextBlock Text="{Binding SolutionIndexLabel}"
                              VerticalAlignment="Center"
                              MinWidth="68"
                              TextAlignment="Center"
                              FontWeight="SemiBold" />
-                  <Button Classes="nav" Content="▶" ToolTip.Tip="{Binding Strings[solution.next]}"
+                  <Button Classes="nav" Content="{Binding Strings[solution.nextShort]}" ToolTip.Tip="{Binding Strings[solution.next]}"
                           Command="{Binding NextSolutionCommand}" />
-                  <Button Classes="nav" Content="⏭" ToolTip.Tip="{Binding Strings[solution.last]}"
+                  <Button Classes="nav" Content="{Binding Strings[solution.lastShort]}" ToolTip.Tip="{Binding Strings[solution.last]}"
                           Command="{Binding LastSolutionCommand}" />
                 </StackPanel>
                 <TextBlock Grid.Column="1"

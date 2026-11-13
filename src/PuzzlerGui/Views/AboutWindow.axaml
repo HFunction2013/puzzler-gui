@@ -26,8 +26,10 @@
     <TextBlock Classes="hint" TextWrapping="Wrap"
                Text="{Binding Loc[dialog.aboutBuiltWith]}" />
 
-    <TextBlock Classes="hint" TextWrapping="Wrap"
-               Text="https://github.com/HFunction2013/puzzler-gui" />
+    <Button Classes="link"
+            Content="https://github.com/HFunction2013/puzzler-gui"
+            HorizontalAlignment="Left"
+            Click="OnRepositoryClick" />
 
     <Button Content="{Binding Loc[dialog.close]}" HorizontalAlignment="Right" MinWidth="88"
             HorizontalContentAlignment="Center" Click="OnCloseClick" />

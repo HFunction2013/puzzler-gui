@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -7,6 +8,8 @@ namespace PuzzlerGui.Views;
 
 public sealed partial class AboutWindow : Window
 {
+    private const string RepositoryUrl = "https://github.com/HFunction2013/puzzler-gui";
+
     public LocalizationService Loc { get; }
 
     public AboutWindow()
@@ -22,4 +25,20 @@ public sealed partial class AboutWindow : Window
     }
 
     private void OnCloseClick(object? sender, RoutedEventArgs e) => Close();
+
+    private void OnRepositoryClick(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = RepositoryUrl,
+                UseShellExecute = true,
+            });
+        }
+        catch (Exception)
+        {
+            // Opening the external browser is best-effort; the URL remains visible above.
+        }
+    }
 }

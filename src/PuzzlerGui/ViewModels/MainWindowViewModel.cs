@@ -1264,9 +1264,16 @@ public sealed partial class MainWindowViewModel : ObservableObject
 
         var cells = new int[width * height];
         var labels = new string[width * height];
+        var fallbackOrder = 0;
         foreach (var placement in solution.Placements)
         {
-            var color = Placements.Count + 1;
+            var color = ResolveSolutionPieceColor(placement, report);
+            if (color < 1)
+            {
+                fallbackOrder++;
+                color = fallbackOrder;
+            }
+
             var label = color.ToString(CultureInfo.InvariantCulture);
             foreach (var cell in placement.Cells)
             {
@@ -1288,7 +1295,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
             }
 
             Placements.Add(new PlacementRow(
-                $"{Placements.Count + 1}.  {placement.Piece}   ·   " +
+                $"{label}.  {placement.Piece}   ·   " +
                 string.Format(Loc["placement.cells"], placement.Cells.Length) +
                 $"   ·   {placement.RotationDegrees}°" +
                 (placement.Flipped ? $"   ·   {Loc["placement.flipped"]}" : string.Empty),
@@ -1299,6 +1306,19 @@ public sealed partial class MainWindowViewModel : ObservableObject
         MultiplicityText = solution.SymmetryMultiplicity > 1
             ? string.Format(Loc["placement.represents"], solution.SymmetryMultiplicity)
             : Loc["placement.unique"];
+    }
+
+    private int ResolveSolutionPieceColor(PlacementInfo placement, SolveReport report)
+    {
+        var piece = _document.Pieces.FirstOrDefault(candidate => candidate.Id == placement.Piece);
+        if (piece is not null)
+        {
+            return piece.ColorIndex;
+        }
+
+        return placement.PieceIndex >= 0 && placement.PieceIndex < report.Puzzle.Pieces.Count
+            ? placement.PieceIndex + 1
+            : 0;
     }
 
     private void UpdateSolverStatus()

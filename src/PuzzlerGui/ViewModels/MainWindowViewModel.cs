@@ -949,7 +949,7 @@ public sealed partial class MainWindowViewModel : ObservableObject
         }
 
         var reportType = AppJsonSerializerContext.Default.SolveReport;
-        var options = new JsonSerializerOptions(reportType.JsonTypeInfo.Options)
+        var options = new JsonSerializerOptions(reportType.Options)
         {
             WriteIndented = !compressJson,
         };

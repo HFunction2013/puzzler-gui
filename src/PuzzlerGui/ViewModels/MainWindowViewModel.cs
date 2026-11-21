@@ -948,12 +948,10 @@ public sealed partial class MainWindowViewModel : ObservableObject
             return string.Empty;
         }
 
-        var reportType = AppJsonSerializerContext.Default.SolveReport;
-        var options = new JsonSerializerOptions(reportType.Options)
-        {
-            WriteIndented = !compressJson,
-        };
-        return JsonSerializer.Serialize(report, reportType, options) + Environment.NewLine;
+        var reportType = compressJson
+            ? AppJsonSerializerCompactContext.Default.SolveReport
+            : AppJsonSerializerContext.Default.SolveReport;
+        return JsonSerializer.Serialize(report, reportType) + Environment.NewLine;
     }
 
     public void ClearBanner()

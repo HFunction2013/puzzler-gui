@@ -90,11 +90,14 @@ Tagged builds (`v*`) publish Native AOT self-contained archives for:
 | macOS Apple silicon | `osx-arm64` |
 
 Each archive contains the GUI, the `puzzler` solver for that platform, and the
-sample puzzles. Windows x64 also ships an English MSI installer that lets you
-choose the install location, create optional Start Menu and Desktop shortcuts,
-register `.pzle` files with `puzzler-gui`, and launch the application after
-setup by default. Uninstalling the MSI also removes the per-user settings and
-recovery data under `%APPDATA%\puzzler-gui`.
+sample puzzles. Native AOT removes the JIT and managed runtime deployment, but
+the Avalonia/SkiaSharp stack still bundles its native rendering, text shaping,
+and Avalonia native libraries, so compressed release archives remain roughly
+20 MiB on this stack. Windows x64 also ships an English MSI installer that lets
+you choose the install location, create optional Start Menu and Desktop
+shortcuts, register `.pzle` files with `puzzler-gui`, and launch the application
+after setup by default. Uninstalling the MSI also removes the per-user settings
+and recovery data under `%APPDATA%\puzzler-gui`.
 
 - **macOS:** the release archive contains `PuzzlerGui.app`, whose `Info.plist`
   declares the `.pzle` document type; opening a `.pzle` file launches the GUI.

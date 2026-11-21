@@ -22,12 +22,6 @@ public sealed class AppSettings
 
 public static class SettingsStore
 {
-    private static readonly JsonSerializerOptions Options =
-        new(AppJsonSerializerContext.Default.AppSettings.JsonTypeInfo.Options)
-        {
-            WriteIndented = true,
-        };
-
     public static string ConfigDirectory
     {
         get
@@ -78,7 +72,7 @@ public static class SettingsStore
         try
         {
             Directory.CreateDirectory(ConfigDirectory);
-            File.WriteAllText(SettingsFile, JsonSerializer.Serialize(settings, Options));
+            File.WriteAllText(SettingsFile, JsonSerializer.Serialize(settings, AppJsonSerializerContext.Default.AppSettings));
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {

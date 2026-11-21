@@ -7,7 +7,7 @@ namespace PuzzlerGui.Services;
 /// <summary>
 /// Source-generated JSON metadata required by Native AOT and trimming.
 /// </summary>
-[JsonSourceGenerationOptions(PropertyNameCaseInsensitive = true)]
+[JsonSourceGenerationOptions(PropertyNameCaseInsensitive = true, WriteIndented = true)]
 [JsonSerializable(typeof(AppSettings))]
 [JsonSerializable(typeof(List<string>))]
 [JsonSerializable(typeof(SolveReport))]

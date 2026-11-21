@@ -119,9 +119,10 @@ jobs:
             chmod +x publish/linux/install-linux.sh
           fi
 
-          # Keep release archives clean: no debug symbols or XML documentation.
+          # Keep release archives clean: no native debug bundles/symbols or XML documentation.
           # The Linux MIME package keeps its required .xml file under linux/.
-          find publish -type f \( -name '*.pdb' -o -name '*.xml' \) ! -path '*/linux/*' -delete
+          find publish -type d -iname '*.dsym' -prune -exec rm -rf {} +
+          find publish -type f \( -name '*.pdb' -o -name '*.dbg' -o -name '*.xml' \) ! -path '*/linux/*' -delete
           echo 'Publish directory size:'
           du -sh publish
           du -ah publish | sort -h | tail -20

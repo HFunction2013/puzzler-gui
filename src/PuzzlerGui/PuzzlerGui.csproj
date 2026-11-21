@@ -15,6 +15,7 @@
     <PublishAot>true</PublishAot>
     <IsAotCompatible>true</IsAotCompatible>
     <TrimMode>link</TrimMode>
+    <StripSymbols>true</StripSymbols>
     <IlcOptimizationPreference>Size</IlcOptimizationPreference>
     <Version>0.1.12</Version>
     <Authors>HFunction2013</Authors>

@@ -9,11 +9,6 @@ namespace PuzzlerGui.Services;
 /// <summary>Runs the <c>puzzler</c> executable and reads its JSON report.</summary>
 public sealed class PuzzlerRunner
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true,
-    };
-
     private readonly Func<string?> _solverPathProvider;
 
     public PuzzlerRunner(Func<string?> solverPathProvider)
@@ -63,7 +58,7 @@ public sealed class PuzzlerRunner
                 {
                     try
                     {
-                        report = JsonSerializer.Deserialize<SolveReport>(json, JsonOptions);
+                        report = JsonSerializer.Deserialize(json, AppJsonSerializerContext.Default.SolveReport);
                     }
                     catch (JsonException ex)
                     {

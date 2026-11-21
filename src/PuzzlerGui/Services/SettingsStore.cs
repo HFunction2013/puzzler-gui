@@ -22,10 +22,11 @@ public sealed class AppSettings
 
 public static class SettingsStore
 {
-    private static readonly JsonSerializerOptions Options = new()
-    {
-        WriteIndented = true,
-    };
+    private static readonly JsonSerializerOptions Options =
+        new(AppJsonSerializerContext.Default.AppSettings.JsonTypeInfo.Options)
+        {
+            WriteIndented = true,
+        };
 
     public static string ConfigDirectory
     {
@@ -57,7 +58,7 @@ public static class SettingsStore
             if (File.Exists(SettingsFile))
             {
                 var json = File.ReadAllText(SettingsFile);
-                var settings = JsonSerializer.Deserialize<AppSettings>(json);
+                var settings = JsonSerializer.Deserialize(json, AppJsonSerializerContext.Default.AppSettings);
                 if (settings is not null)
                 {
                     return settings;

@@ -11,8 +11,12 @@
     <ApplicationIcon>Assets/puzzler-gui.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
-    <Version>0.1.11</Version>
+    <BuiltInComInteropSupport>false</BuiltInComInteropSupport>
+    <PublishAot>true</PublishAot>
+    <IsAotCompatible>true</IsAotCompatible>
+    <TrimMode>link</TrimMode>
+    <IlcOptimizationPreference>Size</IlcOptimizationPreference>
+    <Version>0.1.12</Version>
     <Authors>HFunction2013</Authors>
     <Product>puzzler-gui</Product>
     <Description>Cross-platform desktop front-end for the puzzler exact-cover solver.</Description>

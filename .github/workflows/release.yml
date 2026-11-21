@@ -9,7 +9,7 @@ on:
       version:
         description: Version to stamp into the build (without a leading v)
         required: false
-        default: '0.1.11'
+        default: '0.1.12'
 
 permissions:
   contents: write
@@ -59,7 +59,7 @@ jobs:
             VERSION="${GITHUB_REF_NAME#v}"
           else
             VERSION="${{ github.event.inputs.version }}"
-            if [ -z "$VERSION" ]; then VERSION="0.1.11"; fi
+            if [ -z "$VERSION" ]; then VERSION="0.1.12"; fi
           fi
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "Building puzzler-gui $VERSION for $RID"
@@ -68,6 +68,11 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
+
+      - name: Install Linux Native AOT prerequisites
+        if: runner.os == 'Linux'
+        shell: bash
+        run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev
 
       - name: Download latest puzzler solver
         env:
@@ -87,12 +92,12 @@ jobs:
 
           find solver -maxdepth 2 -type f -name 'puzzler*' -print
 
-      - name: Publish the GUI
+      - name: Publish the GUI (Native AOT)
         run: >-
           dotnet publish src/PuzzlerGui/PuzzlerGui.csproj
           -c Release
           -r ${{ matrix.rid }}
-          --self-contained true
+          -p:PublishAot=true
           -p:Version=${{ env.VERSION }}
           -p:DebugType=none
           -p:DebugSymbols=false
@@ -117,6 +122,9 @@ jobs:
           # Keep release archives clean: no debug symbols or XML documentation.
           # The Linux MIME package keeps its required .xml file under linux/.
           find publish -type f \( -name '*.pdb' -o -name '*.xml' \) ! -path '*/linux/*' -delete
+          echo 'Publish directory size:'
+          du -sh publish
+          du -ah publish | sort -h | tail -20
           ls -la publish
 
       - name: Build macOS app bundle

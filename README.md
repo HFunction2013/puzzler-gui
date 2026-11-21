@@ -40,8 +40,8 @@ solver, and flip through every distinct tiling without touching a terminal.
 
 ## Requirements
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/download) (or the self-contained
-  release archives, which need no runtime installed).
+- [.NET 8 SDK](https://dotnet.microsoft.com/download) (or the Native AOT
+  release archives, which need no .NET runtime installed).
 - The **puzzler** command-line program. Release archives of this GUI already
   bundle a matching solver; when building from source, either put `puzzler`
   next to the application or select it in **Settings → Solver**.
@@ -80,7 +80,7 @@ PUZZLER_BIN=/path/to/puzzler dotnet test
 
 ## Releases
 
-Tagged builds (`v*`) publish self-contained archives for:
+Tagged builds (`v*`) publish Native AOT self-contained archives for:
 
 | Platform | Runtime identifier |
 | --- | --- |

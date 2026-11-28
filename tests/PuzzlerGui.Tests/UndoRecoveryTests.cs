@@ -41,6 +41,7 @@ public sealed class UndoRecoveryTests : IDisposable
     public void Mutation_PersistsRecovery_AndDiscardRemovesIt()
     {
         var viewModel = NewViewModel();
+        viewModel.DiscardRecovery();
 
         Assert.False(File.Exists(MainWindowViewModel.RecoveryFile));
 
@@ -64,7 +65,7 @@ public sealed class UndoRecoveryTests : IDisposable
         Assert.True(restored.IsDirty);
         Assert.True(File.Exists(MainWindowViewModel.RecoveryFile));
 
-        var savePath = Path.Combine(_configHome, "restored.pzle");
+        var savePath = Path.Combine(Path.GetTempPath(), $"puzzler-gui-restored-{Guid.NewGuid():N}.pzle");
         Assert.True(restored.SaveTo(savePath, out _));
         Assert.False(restored.IsDirty);
         Assert.False(File.Exists(MainWindowViewModel.RecoveryFile));

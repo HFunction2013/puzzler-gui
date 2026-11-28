@@ -52,7 +52,7 @@ public sealed class UndoRecoveryTests : IDisposable
     }
 
     [Fact]
-    public void TryLoadRecoveryText_RestoresSavedDocument()
+    public void TryLoadRecoveryText_RestoresDocument_AndKeepsItUnsavedUntilSave()
     {
         var source = NewViewModel();
         source.BoardWidthValue = 6;
@@ -61,6 +61,12 @@ public sealed class UndoRecoveryTests : IDisposable
         var restored = NewViewModel();
         Assert.True(restored.TryLoadRecoveryText(recoveryText));
         Assert.Equal(6, restored.Document.Board.Width);
+        Assert.True(restored.IsDirty);
+        Assert.True(File.Exists(MainWindowViewModel.RecoveryFile));
+
+        var savePath = Path.Combine(_configHome, "restored.pzle");
+        Assert.True(restored.SaveTo(savePath, out _));
+        Assert.False(restored.IsDirty);
         Assert.False(File.Exists(MainWindowViewModel.RecoveryFile));
     }
 

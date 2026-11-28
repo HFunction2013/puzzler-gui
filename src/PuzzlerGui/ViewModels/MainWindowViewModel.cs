@@ -663,7 +663,8 @@ public sealed partial class MainWindowViewModel : ObservableObject
         try
         {
             SetDocument(PuzzleYaml.Load(text), null);
-            ClearRecovery();
+            PersistRecovery();
+            IsDirty = true;
             StatusText = Loc["status.restored"];
             ClearBanner();
             return true;

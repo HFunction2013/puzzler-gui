@@ -221,7 +221,7 @@ public sealed partial class MainWindow : Window
         _ = ConfirmCloseAsync();
     }
 
-    private async Task ConfirmCloseAsync()
+    internal async Task ConfirmCloseAsync()
     {
         if (_closePromptOpen)
         {

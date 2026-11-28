@@ -17,7 +17,7 @@
     <TrimMode>link</TrimMode>
     <StripSymbols>true</StripSymbols>
     <IlcOptimizationPreference>Size</IlcOptimizationPreference>
-    <Version>0.1.12</Version>
+    <Version>0.1.13</Version>
     <Authors>HFunction2013</Authors>
     <Product>puzzler-gui</Product>
     <Description>Cross-platform desktop front-end for the puzzler exact-cover solver.</Description>

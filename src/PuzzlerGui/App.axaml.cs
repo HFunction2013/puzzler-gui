@@ -28,6 +28,22 @@ public sealed partial class App : Application
             var window = new MainWindow { DataContext = viewModel };
             desktop.MainWindow = window;
             desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
+            desktop.ShutdownRequested += async (_, e) =>
+            {
+                if (viewModel.IsSolving)
+                {
+                    viewModel.CancelSolveCommand.Execute(null);
+                }
+
+                if (!viewModel.IsDirty)
+                {
+                    viewModel.PrepareForCleanExit();
+                    return;
+                }
+
+                e.Cancel = true;
+                await window.ConfirmCloseAsync();
+            };
 
             var initialFile = GetInitialFile(desktop.Args);
             window.Opened += async (_, _) =>

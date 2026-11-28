@@ -20,6 +20,7 @@ solver, and flip through every distinct tiling without touching a terminal.
 - **Editor history** — `Ctrl+Z` undoes the last puzzle edit and `Ctrl+Y` or
   `Ctrl+Shift+Z` redoes it. Unsaved work is kept in a private recovery file; if
   the application exits forcibly, the next launch asks whether to restore it.
+  Restored work stays marked unsaved until it is explicitly saved.
 - **Solver integration** — calls the `puzzler` executable with the current
   puzzle and passes through the solution limit, node limit, time limit, colour
   seed, symmetry-deduplication switch and the compact-JSON (`--compress`)
@@ -31,8 +32,9 @@ solver, and flip through every distinct tiling without touching a terminal.
   Home / End and ← / → keys, plus JSON export of the full solver report.
 - **Desktop conveniences** — open files by drag and drop or from the command
   line, recent files, Ctrl+N/O/S and Ctrl+Shift+S shortcuts, F5 to solve, Esc to
-  cancel, an unsaved-changes prompt, light/dark/system themes, and a settings
-  dialog for locating the solver.
+  cancel, an unsaved-changes prompt for window close and platform logout or
+  shutdown, light/dark/system themes, and a settings dialog for locating the
+  solver.
 - **Localization** — the interface follows the system locale and supports
   English, Simplified Chinese, Traditional Chinese and Japanese; unmatched
   locales fall back to English. The first launch offers a language choice, and
